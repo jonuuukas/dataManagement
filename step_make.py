@@ -29,14 +29,7 @@ class MasterConfMaker:
         
         #make master config header
         master = file('master.conf','w')
-        header = '''\
-        [DEFAULT]
-        group=ppd
-        user=mliutkut
-        request_type=ReReco
-        release=%s
-        globaltag=%s
-        ''' % (os.getenv('CMSSW_VERSION'),GT)
+        header = "[DEFAULT]\ngroup=ppd\nuser=mliutkut\nrequest_type=ReReco\nrelease=%s\nglobaltag=%s" % (os.getenv('CMSSW_VERSION'),GT)
         master.write(header)
         
         runlists = {}
@@ -85,7 +78,10 @@ class MasterConfMaker:
                 master.write('skim_cfg=%s\n'%(skim_file))
                 master.write('skim_name=%s\n'%(skim_file.replace('.py','')))
             if mini_file!='':
-                master.write('miniAOD_cfg=%s'%(mini_file))
+                if cfg != '':
+                    master.write('step2_cfg=%s'%(mini_file))
+                else:
+                    master.write('cfg_path=%s'%(mini_file))
 
             master.write('\n\n')
 
@@ -106,3 +102,7 @@ if __name__ == '__main__':
 
 
 
+    str = (""
+    ""
+    ""
+    "")

@@ -89,9 +89,9 @@
                
                   Actions: 
                   <div class="btn-group">
-                     <label class="btn btn-info" ng-model="checkAll.reco" btn-checkbox>Reco</label>
-                     <label class="btn btn-info" ng-model="checkAll.skim" btn-checkbox>Skim</label>
-                     <label class="btn btn-info" ng-model="checkAll.mini" btn-checkbox>MiniAOD</label>
+                                       <label class="btn btn-info" ng-model="checkAll.reco" ng-change="checkAllChange('reco')" btn-checkbox>Reco</label>
+                     <label class="btn btn-info" ng-model="checkAll.skim" ng-change="checkAllChange('skim')" btn-checkbox>Skim</label>
+                     <label class="btn btn-info" ng-model="checkAll.mini" ng-change="checkAllChange('mini')" btn-checkbox>MiniAOD</label>
                   </div>
                </div>
             </div>
@@ -230,6 +230,7 @@
                </div>
             </div>
             <div class="row">
+               <hr>
                <div class="col-lg-6">
                   <h4>Alca configurations:</h4>
                   <ng-form name="fieldForm">                     
@@ -288,9 +289,9 @@
                         
                            Actions: 
                            <div class="btn-group">
-                              <label class="btn btn-info" ng-model="check[name].reco" btn-checkbox>Reco</label>
-                              <label class="btn btn-info" ng-model="check[name].skim" btn-checkbox>Skim</label>
-                              <label class="btn btn-info" ng-model="check[name].mini" btn-checkbox>MiniAOD</label>
+                              <label class="btn btn-info" ng-model="check[name].reco" ng-change="checkChange(name, 'reco')" btn-checkbox>Reco</label>
+                              <label class="btn btn-info" ng-model="check[name].skim" ng-change="checkChange(name, 'skim')" btn-checkbox>Skim</label>
+                              <label class="btn btn-info" ng-model="check[name].mini" ng-change="checkChange(name, 'mini')" btn-checkbox>MiniAOD</label>
                            </div>
                         </div>
                      </div>
@@ -430,8 +431,17 @@
                </accordion>
             </div>
          </form>
+
          <div class="row"></div>
-         <pre>{{data | json}}</pre>
+         <accordion close-others="oneAtATime">
+            <accordion-group is-open="status.open">
+               <accordion-heading>
+                  Full JSON
+                  <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+               </accordion-heading>
+               <pre>{{data | json}}</pre>
+            </accordion-group>
+         </accordion>         
       </div>
    </body>
 </html>
