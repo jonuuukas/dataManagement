@@ -98,11 +98,3 @@ if __name__ == '__main__':
     print "Options: %s" %options
     conf_maker = MasterConfMaker(options.input, 'http://moni.cern.ch:5984/')
     conf_maker.makeMaster()
-
-
-
-
-    str = (""
-    ""
-    ""
-    "")

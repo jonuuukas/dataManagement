@@ -31,11 +31,9 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     if (!(name in $scope.data['req'])){
       name = name || "NewDataSet";
 
-      //add to all needed sets
+      //add to all sets
       $scope.data['req'][name] = {"id" : name, "filter" : true, "action" : {}};
-      
-      $scope.check[name] = {"reco" : false, "skim" : false, "mini" : false};
-      
+      $scope.check[name] = {"reco" : false, "skim" : false, "mini" : false};      
       $scope.drive[name] = {};
       $scope.allOpt[name] = {};
       
@@ -44,16 +42,9 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.drive[name][key] = {};
 
         if ($scope.checkAll[key]){
-          console.log("checkAll key: " + key);
-          //$scope.test(name,key);          
+          console.log("checkAll key: " + key);       
           $scope.check[name][key] = true;
           $scope.checkChange(name, key);
-          //$scope.allOpt[name][action] = JSON.parse(JSON.stringify($scope.defOpt[action]));
-          //$scope.allOpt[name][key] = JSON.parse(JSON.stringify($scope.allOpt['Default'][key]));
-          //$scope.data['req'][name]['action'][key] = {};
-          //if ($scope.defCon[key] != undefined){
-            //$scope.data['req'][name]['action'][key] = JSON.parse(JSON.stringify($scope.defCon[key]));
-          //}
         }
 
         $scope.checkAlca(name);
@@ -67,36 +58,35 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.checkAllChange = function(action)
   {
     console.log("checkTest: " + action);
-    //action is the new action
-      //true to false
-      if ($scope.checkAll[action] == false){// oldValue[action] == true && newValue[action] == false){
-        for (dataset in $scope.data['req']){
-          delete $scope.data['req'][dataset]['action'][action];
-          $scope.allOpt[dataset][action] = false;
-          $scope.check[dataset][action] = false;
-        }
-        delete $scope.defCon[action];
+    //true to false
+    if ($scope.checkAll[action] == false){
+      for (dataset in $scope.data['req']){
+        delete $scope.data['req'][dataset]['action'][action];
+        $scope.allOpt[dataset][action] = false;
+        $scope.check[dataset][action] = false;
       }
+      delete $scope.defCon[action];
+    }
 
-      //false to true
-      if ($scope.checkAll[action] == true){ //oldValue[action] == false && newValue[action] == true){
-        if ($scope.allOpt['Default'][action] == undefined){
-          $scope.allOpt['Default'][action] = JSON.parse(JSON.stringify($scope.defOpt[action]));
-        }        
+    //false to true
+    if ($scope.checkAll[action] == true){
+      if ($scope.allOpt['Default'][action] == undefined){
+        $scope.allOpt['Default'][action] = JSON.parse(JSON.stringify($scope.defOpt[action]));
+      }        
 
-        for (dataset in $scope.data['req']){
-          if ($scope.check[dataset][action] == true){
-            $scope.cleanDatasetInfo(dataset, action);
-          }
-          $scope.check[dataset][action] = true;
-          $scope.addDatasetInfo(dataset,action);
-
-          if (action == 'skim'){
-            $scope.checkSkim(dataset);
-          }
+      for (dataset in $scope.data['req']){
+        if ($scope.check[dataset][action] == true){
+          $scope.cleanDatasetInfo(dataset, action);
         }
-        $scope.formDriver('Default', action);
+        $scope.check[dataset][action] = true;
+        $scope.addDatasetInfo(dataset,action);
+
+        if (action == 'skim'){
+          $scope.checkSkim(dataset);
+        }
       }
+      $scope.formDriver('Default', action);
+    }
     
   };
 
