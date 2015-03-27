@@ -2,40 +2,32 @@ import json
 import os
 import optparse
 import urllib2
+from couchdb_interface import *
 
 class MasterConfMaker:
 
     def __init__(self, doc_id, DB_url):
         print "doc_id: %s" %doc_id
-        self.url_address = DB_url
-        self.opener = urllib2.build_opener(urllib2.HTTPHandler)
+        self.couch = CouchDBInterface(DB_url)
         self.cmsD=True
-        self.data = self.get_file(doc_id)
-        print '****************************'
-        print self.data
-        print "****************************"   
-
-    def get_file(self, fileID):
-        request = urllib2.Request(self.url_address +'/campaigns/' + fileID)
-        request.add_header('Content-Type', 'text/plain')
-        request.get_method = lambda: 'GET'
-        url = self.opener.open(request)
-        return json.loads(url.read())
+        self.data = self.couch.get_file(doc_id)
+        #print self.couch.delete_file(doc_id, self.data['_rev'])
+        #print self.data  
     
     def makeMaster(self):
-        GT = self.data['campaign1']['GT']
+        GT = self.data['data']['GT']
         drive = self.data['drive']
         del drive['Default']
         
         #make master config header
         master = file('master.conf','w')
-        header = "[DEFAULT]\ngroup=ppd\nuser=mliutkut\nrequest_type=ReReco\nrelease=%s\nglobaltag=%s" % (os.getenv('CMSSW_VERSION'),GT)
+        header = "[DEFAULT]\ngroup=ppd\nuser=mliutkut\nrequest_type=ReReco\nrelease=%s\nglobaltag=%s\n" % (os.getenv('CMSSW_VERSION'),GT)
         master.write(header)
         
         runlists = {}
         for era in ['A','B','C','D']:
             runlists['2012%s'%era]=eval(os.popen('curl -s http://cms-pdmv.web.cern.ch/cms-pdmv/doc/DCS-json-2012eras/DCSjson-2012%s.txt'%era).read())
-        era = self.data['campaign1']['era']
+        era = self.data['data']['era']
 
         #read all drivers and execute
         for ds in drive:
@@ -61,7 +53,8 @@ class MasterConfMaker:
                         mini_file = param[index]
 
             site=''
-            prio=int(self.data['campaign1']['prio'])
+            ds = ds.split("/")[1]
+            prio=int(self.data['data']['prio'])
             dataset='/%s/Run%s-v1/RAW'%(ds, era)
             runlist=[]
             if True:
