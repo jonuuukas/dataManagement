@@ -450,7 +450,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
               'alca' : $scope.alca,
               'skim' : $scope.skim,
               'defaults' : $scope.defCon,
-              'submited' : false
+              'submitted' : false
             }
     }).success(function(data, status){
       $scope.alertMsg = {error : false, msg : "Action was successful.", show : true};

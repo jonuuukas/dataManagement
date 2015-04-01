@@ -2,31 +2,44 @@ import json
 import os
 import optparse
 import urllib2
-from couchdb_interface import *
+from couchdb_interface import CouchDBInterface
 
 class MasterConfMaker:
+    """
+    A class that forms master.conf file
+    """
 
     def __init__(self, doc_id, DB_url):
+        """
+        init a class
+        """
         print "doc_id: %s" %doc_id
         self.couch = CouchDBInterface(DB_url)
-        self.cmsD=True
+        self.cmsD = True
         self.data = self.couch.get_file(doc_id)
-        #print self.couch.delete_file(doc_id, self.data['_rev'])
-        #print self.data  
     
     def makeMaster(self):
+        """
+        method to form configuration files
+        """
         GT = self.data['data']['GT']
         drive = self.data['drive']
         del drive['Default']
         
         #make master config header
         master = file('master.conf','w')
-        header = "[DEFAULT]\ngroup=ppd\nuser=mliutkut\nrequest_type=ReReco\nrelease=%s\nglobaltag=%s\n" % (os.getenv('CMSSW_VERSION'),GT)
+        header = "[DEFAULT]\n"
+        header += "group=ppd\n"
+        header += "user=mliutkut\n"
+        header += "request_type=ReReco\n"
+        header += "release=%s\n"
+        header += "globaltag=%s\n" % (os.getenv('CMSSW_VERSION'), GT)
         master.write(header)
         
         runlists = {}
         for era in ['A','B','C','D']:
-            runlists['2012%s'%era]=eval(os.popen('curl -s http://cms-pdmv.web.cern.ch/cms-pdmv/doc/DCS-json-2012eras/DCSjson-2012%s.txt'%era).read())
+            runlist_link = 'http://cms-pdmv.web.cern.ch/cms-pdmv/doc/DCS-json-2012eras/DCSjson-2012%s.txt'%era
+            runlists['2012%s'%era] = eval(os.popen('curl -s %s'%runlist_link).read())
         era = self.data['data']['era']
 
         #read all drivers and execute
@@ -82,12 +95,8 @@ class MasterConfMaker:
         return file('master.conf','r').read()
 
 if __name__ == '__main__':
-
     parser = optparse.OptionParser()
-    parser.add_option("--in",
-                       dest="input"
-                      )
+    parser.add_option("--in", dest="input")
     options,args=parser.parse_args()
-    print "Options: %s" %options
     conf_maker = MasterConfMaker(options.input, 'http://moni.cern.ch:5984/')
     conf_maker.makeMaster()
