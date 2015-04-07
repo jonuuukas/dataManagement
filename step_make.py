@@ -25,6 +25,7 @@ class MasterConfMaker:
         GT = self.data['data']['GT']
         __release = self.data['data']['CMSSW']
         drive = self.data['drive']
+        check = self.data['check']
         del drive['Default']
         
         #make master config header
@@ -53,15 +54,15 @@ class MasterConfMaker:
                 print com
                 if com != '' and com != {}:
                     os.system(com)
-                    if action == 'reco':
+                    if action == 'reco' and check[ds]['reco'] == True:
                         param = com.split()
                         index = param.index("--python") + 1
                         cfg = param[index]
-                    if action == 'skim':
+                    if action == 'skim' and check[ds]['skim'] == True:
                         param = com.split()
                         index = param.index("--python_filename") + 1
                         skim_file = param[index]
-                    if action == 'mini':
+                    if action == 'mini' and check[ds]['mini'] == True:
                         param = com.split()
                         index = param.index("--python_filename") + 1
                         mini_file = param[index]
