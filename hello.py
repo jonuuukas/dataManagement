@@ -51,7 +51,7 @@ def get_bash(__release, _id):
     comm = "#!/bin/bash\n"
     comm += "mkdir %s\n" %WORKDIR
     comm += "cd %s\n" %WORKDIR
-    comm += "export SCRAM_ARCH=slc6_amd64_gcc481\n"
+    comm += "export SCRAM_ARCH=slc6_amd64_gcc491\n"
     comm += "source /afs/cern.ch/cms/cmsset_default.sh\n"
     comm += "scram p CMSSW %s\n" % (__release)
     comm += "cd %s/src\n" % (__release)

@@ -98,5 +98,5 @@ if __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option("--in", dest="input")
     options,args=parser.parse_args()
-    conf_maker = MasterConfMaker(options.input, 'http://moni.cern.ch:5984/')
+    conf_maker = MasterConfMaker(options.input, 'http://moni.cern.ch:5984/campaigns/')
     conf_maker.makeMaster()
