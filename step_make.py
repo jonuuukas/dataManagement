@@ -23,7 +23,7 @@ class MasterConfMaker:
         method to form configuration files
         """
         GT = self.data['data']['GT']
-        _release = self.data['data']['CMSSW']
+        __release = self.data['data']['CMSSW']
         drive = self.data['drive']
         del drive['Default']
         
@@ -33,7 +33,7 @@ class MasterConfMaker:
         header += "group=ppd\n"
         header += "user=mliutkut\n"
         header += "request_type=ReReco\n"
-        header += "release=%s\n"
+        header += "release=%s\n" %(__release)
         header += "globaltag=%s\n" %(GT)
         master.write(header)
         
