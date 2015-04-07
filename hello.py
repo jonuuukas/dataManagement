@@ -47,7 +47,7 @@ def save_doc():
 
 def get_bash(__release, _id):
     #------------To checkout CMSSW---------------------
-    WORKDIR = datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')
+    WORKDIR = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M')
     comm = "#!/bin/bash\n"
     comm += "mkdir %s\n" %WORKDIR
     comm += "cd %s\n" %WORKDIR
