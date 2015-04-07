@@ -23,6 +23,7 @@ class MasterConfMaker:
         method to form configuration files
         """
         GT = self.data['data']['GT']
+        _release = self.data['data']['CMSSW']
         drive = self.data['drive']
         del drive['Default']
         
@@ -33,7 +34,7 @@ class MasterConfMaker:
         header += "user=mliutkut\n"
         header += "request_type=ReReco\n"
         header += "release=%s\n"
-        header += "globaltag=%s\n" % (os.getenv('CMSSW_VERSION'), GT)
+        header += "globaltag=%s\n" %(GT)
         master.write(header)
         
         runlists = {}
