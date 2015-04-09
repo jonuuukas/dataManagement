@@ -62,7 +62,7 @@ def get_bash(__release, _id):
     comm += "python step_make.py --in=%s\n" % (_id)
     #-------------For wmcontrol.py---------------------
     comm += "source /afs/cern.ch/cms/PPD/PdmV/tools/wmclient/current/etc/wmclient.sh\n" 
-    comm += "export PATH=/afs/cern.ch/cms/PPD/PdmV/tools/wmcontrol:${PATH}\n"
+    comm += "export PATH=/afs/cern.ch/cms/PPD/PdmV/tools/wmcontrol_testful:${PATH}\n"
     comm += "cat /afs/cern.ch/user/m/mliutkut/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin\n"
     comm += "eval `scram runtime -sh`\n"
     comm += "export X509_USER_PROXY=$(voms-proxy-info --path)\n"
