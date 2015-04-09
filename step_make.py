@@ -2,6 +2,7 @@ import json
 import os
 import optparse
 import urllib2
+import re
 from couchdb_interface import CouchDBInterface
 
 class MasterConfMaker:
@@ -65,8 +66,8 @@ class MasterConfMaker:
                         mini_file = param[index]
 
             site=''
-            ds = ds.split("/")[1]
             prio=int(self.data['data']['req'][ds]['prio'])
+            ds = ds.split("/")[1]
             dataset='/%s/Run%s-v1/RAW'%(ds, era)
 
             master.write('[Winter53%s%sPrio%d]\n'%(era, ds, prio))
