@@ -1,6 +1,15 @@
 var myApp = angular.module('myApp', ['ui.bootstrap']);
 myApp.controller('myAppCtrl', function ($scope, $http, $location) {
-  $scope.data = {"_id" : "DefaultCamp", "CMSSW":"CMSSW_7_4_0_pre6", "GT": "GT_FAKE", "era":"2012A", "prio": 7, "req":{}, "filter" : "true"};
+  $scope.data = { 
+                  "_id" : "DefaultCamp", 
+                  "CMSSW":"CMSSW_7_4_0_pre6", 
+                  "GT": "GT_FAKE", 
+                  "era":"2012A", 
+                  "prio": 79000, 
+                  "req":{}, 
+                  "filter" : "true", 
+                  "transient_output" : "[]"
+                };
   $scope.checkAll = {reco : false, skim : false, mini :false};
   $scope.inTheList;
   $scope.list = [];
@@ -29,6 +38,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.defOpt = {"reco" : $scope.recoOpt, "skim" : $scope.skimOpt, "mini" : $scope.miniOpt};
   $scope.alca = {};
   $scope.skim = {};
+  $scope.lumi = {};
 
   //=============Actions with datasets===========//
   $scope.addReq = function(name)
@@ -42,6 +52,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.check[name] = {"reco" : false, "skim" : false, "mini" : false};      
       $scope.drive[name] = {};
       $scope.allOpt[name] = {};
+      $scope.data['req'][name]['prio'] = $scope.data['prio'];
+      $scope.data['req'][name]['transient_output'] = $scope.data['transient_output'];
       
       //go through every action
       for (key in $scope.check[name]){
@@ -169,6 +181,24 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.addDatasetInfo(ds, action);
       $scope.formDriver(ds, action);
     }  
+  };
+
+  $scope.priorityChange = function(priority)
+  {
+
+    for (ds in $scope.data['req']){
+      console.log(ds + " " + priority);
+      $scope.data['req'][ds]['prio'] = priority;
+    }
+  };
+
+  $scope.transientChange = function(transient_output)
+  {
+
+    for (ds in $scope.data['req']){
+      console.log(ds + " " + transient_output);
+      $scope.data['req'][ds]['transient_output'] = transient_output;
+    }
   };
 
   $scope.cleanDrive = function (){
@@ -307,23 +337,25 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         }
         test = new RegExp(test);
 
-        if ($scope.defCon['skim'] != undefined &&/SKIM:/.test($scope.defCon['skim']['steps']) && $scope.skim[ds.split("/")[1]] != undefined){
-          str = $scope.data['req'][ds]['action'][action]['steps'].split('SKIM:');
-          $scope.data['req'][ds]['action'][action]['steps'] = "";
-          temp['steps'] = "";
+        if ($scope.data['req'][ds]['action'][action] != undefined){
+          if ($scope.defCon['skim'] != undefined &&/SKIM:/.test($scope.defCon['skim']['steps']) && $scope.skim[ds.split("/")[1]] != undefined){
+            str = $scope.data['req'][ds]['action'][action]['steps'].split('SKIM:');
+            $scope.data['req'][ds]['action'][action]['steps'] = "";
+            temp['steps'] = "";
 
-          if (str[0] != undefined){
-            $scope.data['req'][ds]['action'][action]['steps'] += str[0];
-            temp['steps'] += str[0];
-          }
+            if (str[0] != undefined){
+              $scope.data['req'][ds]['action'][action]['steps'] += str[0];
+              temp['steps'] += str[0];
+            }
 
-          $scope.data['req'][ds]['action'][action]['steps'] += "SKIM:";
-          temp['steps'] += "SKIM:";
-          temp['steps'] += $scope.skim[ds.split("/")[1]];
+            $scope.data['req'][ds]['action'][action]['steps'] += "SKIM:";
+            temp['steps'] += "SKIM:";
+            temp['steps'] += $scope.skim[ds.split("/")[1]];
 
-          if (str[1] != undefined){
-            $scope.data['req'][ds]['action'][action]['steps'] += str[1];
-            temp['steps'] += str[1];
+            if (str[1] != undefined){
+              $scope.data['req'][ds]['action'][action]['steps'] += str[1];
+              temp['steps'] += str[1];
+            }
           }
         }
       }
@@ -448,6 +480,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
               'check' : $scope.check,
               'allOpt' : $scope.allOpt,
               'alca' : $scope.alca,
+              'lumi' : $scope.lumi,
               'skim' : $scope.skim,
               'defaults' : $scope.defCon,
               'submitted' : false
@@ -481,6 +514,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.drive = data['drive'];
       $scope.skim = data['skim'];
       $scope.alca = data['alca'];
+      $scope.lumi = data['lumi'];
       
       for (action in data['defaults']){
         $scope.checkAll[action] = true;
@@ -538,7 +572,6 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   //==================WATCH===================//
 
   $scope.$watch("data['req']", function(newValue, oldValue) {
-
     for (ds in newValue){
       if (oldValue[ds] == undefined || newValue[ds] != oldValue[ds]){
         for (action in newValue[ds]['action']){
@@ -548,7 +581,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         }
       }
     }
-   },true);
+  },true);
 
   $scope.$watch("skim", function(newValue, oldValue) {
     console.log("watch skim");
@@ -598,15 +631,11 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
   $scope.$watch("data['_id']", function() {
     //id is in the list?
-    //console.log($scope.data['_id']);
     if (($scope.list).indexOf($scope.data['_id']) > -1){
       $scope.inTheList = true;
-      //$scope.loadData();
     } else {
       $scope.inTheList = false;
     }
-
-    //console.log("inTheList: " + $scope.list.indexOf($scope.data['_id']) + "; " + $scope.inTheList);
   },true);
 
   //==============Prepare data================//

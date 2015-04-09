@@ -106,7 +106,15 @@
                            <div class="input-group-addon">Filter</div>
                            <input type="text" class="form-control" id="inputFilter" placeholder="Filter" ng-model="data['filter']">
                         </div>
-                     </div>  
+                     </div>
+
+                     <div class="form-group">
+                        <label class="sr-only" for="inputPriority">Priority</label>
+                        <div class="input-group">
+                           <div class="input-group-addon">Priority</div>
+                           <input type="number" class="form-control" id="inputPriority" ng-change="priorityChange(data['prio'])" ng-model="data['prio']">
+                        </div>
+                     </div>   
 
                   </div>
                </div>
@@ -163,6 +171,13 @@
                         </div>
                      </div>                 
                      <div class="col-lg-8">
+                     <div class="form-group">
+                        <label class="sr-only" for="transientInput">Transient output</label>
+                        <div class="input-group">
+                           <div class="input-group-addon">Transient output</div>
+                           <input type="text" class="form-control" id="transientInput" ng-change="transientChange(data['transient_output'])" ng-model="data['transient_output']">
+                        </div>
+                     </div> 
                         <pre style="margin-top: 5px">{{drive['Default']['reco']}}</pre>                       
 
                         <div class="form-group" style="margin-top: 5px">
@@ -292,6 +307,15 @@
                         <inline-editable ng-model="skim"></inline-editable>
                      </ng-form>
                   </div>
+
+                  <div class="col-lg-6">
+                     <h4>Lumi configurations:</h4>
+                     <ng-form name="lumiFieldForm">                     
+                        <span class="badge badge-important" style="background-color: red" ng-if="lumiFieldForm.$invalid">Bad JSON formatting</span>
+                        <span class="badge badge-success" style="background-color: green" ng-if="!lumiFieldForm.$invalid">Valid JSON formatting</span>
+                        <inline-editable ng-model="lumi"></inline-editable>
+                     </ng-form>
+                  </div>
                </div>
 
             </accordion-group>
@@ -340,6 +364,14 @@
                               <label class="btn btn-info" ng-model="check[name].skim" ng-change="checkChange(name, 'skim')" btn-checkbox>Skim</label>
                               <label class="btn btn-info" ng-model="check[name].mini" ng-change="checkChange(name, 'mini')" btn-checkbox>MiniAOD</label>
                            </div>
+                        
+                           <div class="form-group">
+                              <label class="sr-only" for="inputPrio{{name}}">Priority</label>
+                              <div class="input-group">
+                                 <div class="input-group-addon">Priority</div>
+                                 <input type="number" class="form-control" id="inputPrio{{name}}" placeholder="{{data['prio']}}" ng-model="data['req'][name]['prio']">
+                              </div>
+                           </div> 
                         </div>
                      </div>
 
@@ -372,6 +404,15 @@
                                  </div>
                               </div>                        
                               <div class="col-lg-8">
+
+                                 <div class="form-group">
+                                    <label class="sr-only" for="transientInput{{name}}">Transient output</label>
+                                    <div class="input-group">
+                                       <div class="input-group-addon">Transient output</div>
+                                       <input type="text" class="form-control" id="transientInput{{name}}" ng-model="data['req'][name]['transient_output']">
+                                    </div>
+                                 </div> 
+
                                  <pre style="margin-top: 5px">{{drive[name]['reco']}}</pre>                       
 
                                  <div class="form-group" style="margin-top: 5px">

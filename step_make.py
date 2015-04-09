@@ -26,6 +26,7 @@ class MasterConfMaker:
         __release = self.data['data']['CMSSW']
         drive = self.data['drive']
         check = self.data['check']
+        lumi_list = self.data['lumi']
         del drive['Default']
         
         #make master config header
@@ -36,13 +37,9 @@ class MasterConfMaker:
         header += "request_type=ReReco\n"
         header += "release=%s\n" %(__release)
         header += "globaltag=%s\n" %(GT)
+        if (lumi_list != ''):
+            header += "lumi_list=%s\n" %(lumi_list)
         master.write(header)
-        
-        runlists = {}
-        for era in ['A','B','C','D']:
-            runlist_link = 'http://cms-pdmv.web.cern.ch/cms-pdmv/doc/DCS-json-2012eras/DCSjson-2012%s.txt'%era
-            runlists['2012%s'%era] = eval(os.popen('curl -s %s'%runlist_link).read())
-        era = self.data['data']['era']
 
         #read all drivers and execute
         for ds in drive:
@@ -69,19 +66,20 @@ class MasterConfMaker:
 
             site=''
             ds = ds.split("/")[1]
-            prio=int(self.data['data']['prio'])
+            prio=int(self.data['data']['req'][ds]['prio'])
             dataset='/%s/Run%s-v1/RAW'%(ds, era)
-            runlist=[]
-            if True:
-                runlist=runlists[era]
 
             master.write('[Winter53%s%sPrio%d]\n'%(era, ds, prio))
             master.write('campaign=Run%s\n'%(era))
-            master.write('priority=%d\n'%( 70000 - 1000* prio ))
-            master.write('dset_run_dict={"%s" : %s}\n'%(dataset, runlist))
+            master.write('priority=%d\n'%(prio))
+            #master.write('dset_run_dict={"%s" : %s}\n'%(dataset, runlist))
             
             if (cfg != ''):
                 master.write('cfg_path=%s\n'%(cfg))
+                transient_output = self.data['data']['req'][ds]['transient_output']
+                if (transient_output != ''):
+                    master.write('transient_output=%s\n'%(transient_output))
+
             if skim_file!='':
                 master.write('skim_cfg=%s\n'%(skim_file))
                 master.write('skim_name=%s\n'%(skim_file.replace('.py','')))
