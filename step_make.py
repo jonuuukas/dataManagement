@@ -28,6 +28,7 @@ class MasterConfMaker:
         drive = self.data['drive']
         check = self.data['check']
         lumi_list = self.data['lumi']
+        era = self.data['data']['era']
         del drive['Default']
         
         #make master config header
@@ -67,10 +68,10 @@ class MasterConfMaker:
 
             site=''
             prio=int(self.data['data']['req'][ds]['prio'])
-            ds = ds.split("/")[1]
-            dataset='/%s/Run%s-v1/RAW'%(ds, era)
+            #ds = ds.split("/")[1]
+            #dataset='/%s/Run%s-v1/RAW'%(ds, era)
 
-            master.write('[Winter53%s%sPrio%d]\n'%(era, ds, prio))
+            master.write('[Winter53%s%sPrio%d]\n'%(era, ds.split("/")[1], prio))
             master.write('campaign=Run%s\n'%(era))
             master.write('priority=%d\n'%(prio))
             #master.write('dset_run_dict={"%s" : %s}\n'%(dataset, runlist))
