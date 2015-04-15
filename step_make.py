@@ -27,7 +27,7 @@ class MasterConfMaker:
         __release = self.data['data']['CMSSW']
         drive = self.data['drive']
         check = self.data['check']
-        lumi_list = json.dumps(self.data['lumi'])
+        lumi_list = self.data['lumi']
         era = self.data['data']['era']
         del drive['Default']
         
@@ -41,7 +41,7 @@ class MasterConfMaker:
         header += "globaltag=%s\n" %(GT)
         header += "wmtest=true"
         if (lumi_list != '' and lumi_list != {}):
-            header += "lumi_list=%s\n" %(lumi_list)
+            header += "lumi_list=%s\n" %(json.dumps(lumi_list))
         master.write(header)
 
         #read all drivers and execute
