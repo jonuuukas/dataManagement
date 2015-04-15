@@ -39,7 +39,7 @@ class MasterConfMaker:
         header += "request_type=ReReco\n"
         header += "release=%s\n" %(__release)
         header += "globaltag=%s\n" %(GT)
-        if (lumi_list != ''):
+        if (lumi_list != '' and lumi_list != {}):
             header += "lumi_list=%s\n" %(lumi_list)
         master.write(header)
 
@@ -48,23 +48,29 @@ class MasterConfMaker:
             cfg = ''
             skim_file = ''
             mini_file = ''
+            exc = False
             for action in drive[ds]:
                 com = drive[ds][action]
                 print com
                 if com != '' and com != {}:
-                    os.system(com)
                     if action == 'reco' and check[ds]['reco'] == True:
                         param = com.split()
                         index = param.index("--python") + 1
                         cfg = param[index]
+                        exc = True
                     if action == 'skim' and check[ds]['skim'] == True:
                         param = com.split()
                         index = param.index("--python_filename") + 1
                         skim_file = param[index]
+                        exc = True
                     if action == 'mini' and check[ds]['mini'] == True:
                         param = com.split()
                         index = param.index("--python_filename") + 1
                         mini_file = param[index]
+                        exc = True
+                        
+                    if exc == True:
+                        os.system(com)
 
             site=''
             prio=int(self.data['data']['req'][ds]['prio'])
