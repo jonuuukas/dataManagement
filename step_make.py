@@ -68,9 +68,11 @@ class MasterConfMaker:
                         index = param.index("--python_filename") + 1
                         mini_file = param[index]
                         exc = True
-                        
+
                     if exc == True:
                         os.system(com)
+                        
+                    exc = False
 
             site=''
             prio=int(self.data['data']['req'][ds]['prio'])
