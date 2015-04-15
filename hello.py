@@ -66,7 +66,7 @@ def get_bash(__release, _id):
     comm += "cat /afs/cern.ch/user/m/mliutkut/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin\n"
     comm += "eval `scram runtime -sh`\n"
     comm += "export X509_USER_PROXY=$(voms-proxy-info --path)\n"
-    comm += "wmcontrol.py --req_file=master.conf\n"
+    comm += "wmcontrol.py --wmtest --req_file=master.conf\n"
     #--------------------------------------------------
     return comm 
 
