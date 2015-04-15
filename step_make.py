@@ -27,7 +27,7 @@ class MasterConfMaker:
         __release = self.data['data']['CMSSW']
         drive = self.data['drive']
         check = self.data['check']
-        lumi_list = self.data['lumi']
+        lumi_list = json.dumps(self.data['lumi'])
         era = self.data['data']['era']
         del drive['Default']
         
@@ -39,6 +39,7 @@ class MasterConfMaker:
         header += "request_type=ReReco\n"
         header += "release=%s\n" %(__release)
         header += "globaltag=%s\n" %(GT)
+        header += "wmtest=true"
         if (lumi_list != '' and lumi_list != {}):
             header += "lumi_list=%s\n" %(lumi_list)
         master.write(header)
@@ -71,7 +72,7 @@ class MasterConfMaker:
 
                     if exc == True:
                         os.system(com)
-                        
+
                     exc = False
 
             site=''
