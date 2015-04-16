@@ -87,9 +87,9 @@ class MasterConfMaker:
             
             if (cfg != ''):
                 master.write('cfg_path=%s\n'%(cfg))
-                transient_output = self.data['data']['req'][ds]['transient_output']
-                if (transient_output != ''):
-                    master.write('transient_output=%s\n'%(transient_output))
+                #transient_output = self.data['data']['req'][ds]['transient_output']
+                #if (transient_output != ''):
+                #    master.write('transient_output=%s\n'%(transient_output))
 
             if skim_file!='':
                 master.write('skim_cfg=%s\n'%(skim_file))
