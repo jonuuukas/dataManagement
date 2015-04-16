@@ -37,11 +37,11 @@ class MasterConfMaker:
         header += "group=ppd\n"
         header += "user=mliutkut\n"
         header += "request_type=ReReco\n"
-        header += "release=%s\n" %(__release)
-        header += "globaltag=%s\n" %(GT)
+        header += "release=%s\n" % (__release)
+        header += "globaltag=%s\n" % (GT)
         header += "wmtest=true\n"
         if (lumi_list != '' and lumi_list != {}):
-            header += "lumi_list=%s\n" %(json.dumps(lumi_list))
+            header += "lumi_list=%s\n" % (json.dumps(lumi_list))
         master.write(header)
 
         #read all drivers and execute
@@ -78,27 +78,27 @@ class MasterConfMaker:
             site=''
             prio=int(self.data['data']['req'][ds]['prio'])
             #ds = ds.split("/")[1]
-            #dataset='/%s/Run%s-v1/RAW'%(ds, era)
+            #dataset='/%s/Run%s-v1/RAW' % (ds, era)
 
-            master.write('[Winter53%s%sPrio%d]\n'%(era, ds.split("/")[1], prio))
-            master.write('campaign=Run%s\n'%(era))
-            master.write('priority=%d\n'%(prio))
-            #master.write('dset_run_dict={"%s" : %s}\n'%(dataset, runlist))
+            master.write('[Winter53%s%sPrio%d]\n' % (era, ds.split("/")[1], prio))
+            master.write('campaign=Run%s\n' % (era))
+            master.write('priority=%d\n' % (prio)) 
+            master.write('dset_run_dict={"%s" : %s}\n' % (ds, json.dumps(lumi_list.keys())))
             
             if (cfg != ''):
-                master.write('cfg_path=%s\n'%(cfg))
+                master.write('cfg_path=%s\n' % (cfg))
                 #transient_output = self.data['data']['req'][ds]['transient_output']
                 #if (transient_output != ''):
-                #    master.write('transient_output=%s\n'%(transient_output))
+                #    master.write('transient_output=%s\n' % (transient_output))
 
             if skim_file!='':
-                master.write('skim_cfg=%s\n'%(skim_file))
-                master.write('skim_name=%s\n'%(skim_file.replace('.py','')))
+                master.write('skim_cfg=%s\n' % (skim_file))
+                master.write('skim_name=%s\n' % (skim_file.replace('.py','')))
             if mini_file!='':
                 if cfg != '':
-                    master.write('step2_cfg=%s'%(mini_file))
+                    master.write('step2_cfg=%s' % (mini_file))
                 else:
-                    master.write('cfg_path=%s'%(mini_file))
+                    master.write('cfg_path=%s' % (mini_file))
 
             master.write('\n\n')
 
