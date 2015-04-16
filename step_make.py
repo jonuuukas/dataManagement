@@ -39,7 +39,7 @@ class MasterConfMaker:
         header += "request_type=ReReco\n"
         header += "release=%s\n" %(__release)
         header += "globaltag=%s\n" %(GT)
-        header += "wmtest=true"
+        header += "wmtest=true\n"
         if (lumi_list != '' and lumi_list != {}):
             header += "lumi_list=%s\n" %(json.dumps(lumi_list))
         master.write(header)
