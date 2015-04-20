@@ -96,7 +96,7 @@ def submit_campaign():
     doc = json.dumps(data['doc'])
 
     __scram = get_scram(__release)
-    if __scram = '':
+    if __scram == '':
         return "No scram"
     #update document
     couch.update_file(_id, doc, _rev)
