@@ -2,12 +2,14 @@ import json
 import os
 import urllib2
 
+db_url = 'http://moni.cern.ch:5984/campaigns/'
+
 class CouchDBInterface:
     """
     A class as interface to couchdb via HTTP protocol
     """
 
-    def __init__ (self, db_url):
+    def __init__ (self):
         """
         init a class
         """

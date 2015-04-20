@@ -5,17 +5,18 @@ import urllib2
 import re
 from couchdb_interface import CouchDBInterface
 
+
 class MasterConfMaker:
     """
     A class that forms master.conf file
     """
 
-    def __init__(self, doc_id, DB_url):
+    def __init__(self, doc_id):
         """
         init a class
         """
         print "doc_id: %s" %doc_id
-        self.couch = CouchDBInterface(DB_url)
+        self.couch = CouchDBInterface()
         self.cmsD = True
         self.data = self.couch.get_file(doc_id)
     
@@ -109,5 +110,5 @@ if __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option("--in", dest="input")
     options,args=parser.parse_args()
-    conf_maker = MasterConfMaker(options.input, 'http://moni.cern.ch:5984/campaigns/')
+    conf_maker = MasterConfMaker(options.input)
     conf_maker.makeMaster()

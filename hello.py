@@ -6,17 +6,33 @@ import urllib2
 import subprocess
 import sys
 import datetime
-from couchdb_interface import *
+import xml.dom.minidom
+from couchdb_interface import CouchDBInterface
 
 from flask import Flask, send_from_directory, redirect, Response, make_response, request
 from subprocess import Popen, PIPE
 app = Flask(__name__)
 
-couch = CouchDBInterface('http://moni.cern.ch:5984/campaigns/')
+WORK_DIR = '/stuff'
+couch = CouchDBInterface()
 
 @app.route("/", methods=["GET", "POST"])
 def hello():
     return send_from_directory('templates', 'index.html')
+
+def get_scram(__release):
+    scram = ''
+    xml_data = xml.dom.minidom.parseString(os.popen("curl -s --insecure 'https://cmssdt.cern.ch/SDT/cgi-bin/ReleasesXML/?anytype=1'").read())
+    
+    for arch in xml_data.documentElement.getElementsByTagName("architecture"):
+        scram_arch = arch.getAttribute('name')
+        print scram_arch
+        for project in arch.getElementsByTagName("project"):
+            release = str(project.getAttribute('label'))
+            if release == __release:
+                scram = scram_arch
+    
+    return scram
 
 @app.route('/load_data', methods=["POST"])
 def load_data():
@@ -45,13 +61,13 @@ def save_doc():
     doc_data = couch.put_file(data)
     return json.dumps(doc_data)
 
-def get_bash(__release, _id):
+def get_bash(__release, _id, __scram):
     #------------To checkout CMSSW---------------------
     WORKDIR = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M')
     comm = "#!/bin/bash\n"
     comm += "mkdir %s\n" %WORKDIR
     comm += "cd %s\n" %WORKDIR
-    comm += "export SCRAM_ARCH=slc6_amd64_gcc491\n"
+    comm += "export SCRAM_ARCH=%s\n" %(__scram)
     comm += "source /afs/cern.ch/cms/cmsset_default.sh\n"
     comm += "scram p CMSSW %s\n" % (__release)
     comm += "cd %s/src\n" % (__release)
@@ -79,11 +95,14 @@ def submit_campaign():
     _rev = data['_rev']
     doc = json.dumps(data['doc'])
 
+    __scram = get_scram(__release)
+    if __scram = '':
+        return "No scram"
     #update document
     couch.update_file(_id, doc, _rev)
     #----------Creating & running bash file----------------------
     __curr_dir = os.getcwd()
-    os.chdir('/stuff')
+    os.chdir(WORK_DIR)
     __exec_file = open("tmp_execute.sh", "w")
     __exec_file.write(get_bash(__release, _id))
     __exec_file.close()
