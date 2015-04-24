@@ -15,6 +15,7 @@ app = Flask(__name__)
 
 WORK_DIR = '/stuff'
 couch = CouchDBInterface()
+cred = '/afs/cern.ch/user/m/mliutkut/private/PdmVService.txt'
 
 @app.route("/", methods=["GET", "POST"])
 def hello():
@@ -26,7 +27,6 @@ def get_scram(__release):
     
     for arch in xml_data.documentElement.getElementsByTagName("architecture"):
         scram_arch = arch.getAttribute('name')
-        print scram_arch
         for project in arch.getElementsByTagName("project"):
             release = str(project.getAttribute('label'))
             if release == __release:
@@ -79,7 +79,7 @@ def get_bash(__release, _id, __scram):
     #-------------For wmcontrol.py---------------------
     comm += "source /afs/cern.ch/cms/PPD/PdmV/tools/wmclient/current/etc/wmclient.sh\n" 
     comm += "export PATH=/afs/cern.ch/cms/PPD/PdmV/tools/wmcontrol_testful:${PATH}\n"
-    comm += "cat /afs/cern.ch/user/m/mliutkut/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin\n"
+    comm += "cat %s | voms-proxy-init -voms cms -pwstdin\n" %(cred)
     comm += "eval `scram runtime -sh`\n"
     comm += "export X509_USER_PROXY=$(voms-proxy-info --path)\n"
     comm += "wmcontrol.py --wmtest --req_file=master.conf\n"
@@ -104,7 +104,7 @@ def submit_campaign():
     __curr_dir = os.getcwd()
     os.chdir(WORK_DIR)
     __exec_file = open("tmp_execute.sh", "w")
-    __exec_file.write(get_bash(__release, _id))
+    __exec_file.write(get_bash(__release, _id, __scram))
     __exec_file.close()
     log_file = file('log.txt','w')
     err_file = file('log2.txt','w')
