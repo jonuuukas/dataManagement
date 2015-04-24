@@ -9,20 +9,19 @@
       <script type=text/javascript src="static/js/ui-bootstrap-tpls-0.12.1.js"></script>   
    </head>
    <body ng-app="myApp" ng-controller="myAppCtrl">
-      <div class="container-fluid" style="margin-bottom: 50px">
+      <div class="container" style="margin-bottom: 50px" >
          <!-- Pavadinimas -->
          <div class="row">
             <div class="col-lg-12">
-               <h1>Amazing requests app</h1>
+               <h1>Data management application</h1>
             </div>
-            
          </div>
          <!-- laukai    -->
          <form class="form-inline" role="form" >
             <div class="row">
-               <div class="col-lg-8">
+               <div class="col-lg-12">
 
-                  <input type="text" ng-model="data['_id']" typeahead="elem for elem in list | filter:$viewValue | limitTo:8" class="form-control">
+                  <input type="text" ng-model="data['_id']" typeahead="elem for elem in list | filter:$viewValue | limitTo:10" class="form-control">
 
                   <button type="submit" class="btn btn-primary" ng-if="inTheList" ng-click="loadData()">Load data</button>
                   <button type="submit" class="btn btn-primary" ng-if="!doc['submitted'] && inTheList" ng-click="updateDoc()">Update doc</button>
@@ -36,38 +35,17 @@
                      {{alertMsg['msg']}}
                   </span>
 
-                  <!--<span class="alert alert-danger" role="alert" ng-show="exec_fail">
-                     <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-                     Error executing action
-                  </span>-->
-
-
                </div>
                
             </div>
 
-            <div class="row">
-               <div class="col-lg-12">
-                  <h3>Main campaign info:</h3>
-               </div>
-            </div>
+            
 
             <div class="row">
                <div class="col-lg-12 h4">
-
-                  <!--<div class="form-group">
-                     <label class="sr-only" for="inputName">Name</label>
-                     <div class="input-group">
-                        <div class="input-group-addon">Name</div>
-                        <input type="text" class="form-control" id="inputName" placeholder="Campaign name" ng-model='data["_id"]'>
-                     </div>
-                  </div>-->
-
-
-                  <!--<button type="submit" class="btn btn-primary" ng-click="getAllDocs()">Get all docs</button>-->
                </div>
             </div>
-            <accordion close-others="oneAtATime">
+            <accordion close-others="false">
             <accordion-group is-open="status.open">
                <accordion-heading>
                   Default Configurations
@@ -98,15 +76,7 @@
                            <div class="input-group-addon">CMSSW</div>
                            <input type="text" class="form-control" id="inputCMSSW" placeholder="CMSSW" ng-model='data["CMSSW"]'>
                         </div>
-                     </div>
-
-                     <div class="form-group">
-                        <label class="sr-only" for="inputFilter">Filter</label>
-                        <div class="input-group">
-                           <div class="input-group-addon">Filter</div>
-                           <input type="text" class="form-control" id="inputFilter" placeholder="Filter" ng-model="data['filter']">
-                        </div>
-                     </div>
+                     </div>  
 
                      <div class="form-group">
                         <label class="sr-only" for="inputPriority">Priority</label>
@@ -114,62 +84,56 @@
                            <div class="input-group-addon">Priority</div>
                            <input type="number" class="form-control" id="inputPriority" ng-change="priorityChange(data['prio'])" ng-model="data['prio']">
                         </div>
-                     </div>   
+                     </div> 
 
                   </div>
                </div>
 
+
                <div class="row h6"></div>
 
-
                <div class="row">
-
-                  <div class="col-md-12 h4">
-
-                     <!--
-                     <div class="form-group">
-                        <label class="sr-only" for="inputSkim">Skim</label>
-                        <div class="input-group">
-                           <div class="input-group-addon">Skim</div>
-                           <input type="text" class="form-control" id="inputSkim" placeholder="Skim" ng-model="data['req'][name]['skim']">
-                        </div>
-                     </div>-->
-                  
-                     Actions: 
+                  <div class="col-md-12 h4">           
+                     Add/Delete steps: 
                      <div class="btn-group">
-                                          <label class="btn btn-info" ng-model="checkAll.reco" ng-change="checkAllChange('reco')" btn-checkbox>Reco</label>
-                        <label class="btn btn-info" ng-model="checkAll.skim" ng-change="checkAllChange('skim')" btn-checkbox>Skim</label>
-                        <label class="btn btn-info" ng-model="checkAll.mini" ng-change="checkAllChange('mini')" btn-checkbox>MiniAOD</label>
+                        <label class="btn {{((checkAll.reco) ? 'btn-danger' : 'btn-success')}}" ng-model="checkAll.reco" ng-change="checkAllChange('reco')" btn-checkbox>{{((checkAll.reco) ? 'Delete Reco' : 'Add Reco')}}</label>
+                        <label class="btn {{((checkAll.skim) ? 'btn-danger' : 'btn-success')}}" ng-model="checkAll.skim" ng-change="checkAllChange('skim')" btn-checkbox>{{((checkAll.skim) ? 'Delete Skim' : 'Add Skim')}}</label>
+                        <label class="btn {{((checkAll.mini) ? 'btn-danger' : 'btn-success')}}" ng-model="checkAll.mini" ng-change="checkAllChange('mini')" btn-checkbox>{{((checkAll.mini) ? 'Delete MiniAOD' : 'Add MiniAOD')}}</label>
                      </div>
                   </div>
                </div>
             
-
+            
                <div class="row">
                   <div class="col-lg-12" ng-show="checkAll.reco">
-                     <hr>                                 
-                     <h4>Default RECO configurations:</h4>
+                     <hr>
+                     <accordion-group >
+                        <accordion-heading>
+                           Default RECO configurations:
+                        </accordion-heading>
+                        <hr>                                 
+                        <h4>Default RECO configurations:</h4>
 
-                     <div class="col-lg-4 form-horizontal">
-                        <div class="form-inline">
-                           <div ng-repeat="(id, txt) in allOpt['Default']['reco']"> <!--recoOpt-->
-                              <div class="form-group" style="margin-top: 5px"> 
-                                 <div class="col-lg-4" style="width: 100px">{{txt}}:</div>
-                                 <div class="col-lg-8">
-                                    <div class="input-group">
-                                       <input type="text" class="form-control" placeholder="{{txt}}" ng-model="defCon['reco'][txt]">
-                                       <span class="input-group-btn">
-                                          <button class="btn btn-danger btn-add" type="button" ng-click="removeDefExtra('Default', 'reco', txt, '')">
-                                             <span class="glyphicon glyphicon-minus"></span>
-                                          </button>
-                                       </span>
-                                    </div>                                                 
+                        <div class="col-lg-4 form-horizontal">
+                           <div class="form-inline">
+                              <div ng-repeat="(id, txt) in allOpt['Default']['reco']"> <!--recoOpt-->
+                                 <div class="form-group" style="margin-top: 5px"> 
+                                    <div class="col-lg-4" style="width: 100px">{{txt}}:</div>
+                                    <div class="col-lg-8">
+                                       <div class="input-group">
+                                          <input type="text" class="form-control" placeholder="{{txt}}" ng-model="defCon['reco'][txt]">
+                                          <span class="input-group-btn">
+                                             <button class="btn btn-danger btn-add" type="button" ng-click="removeDefExtra('Default', 'reco', txt, '')">
+                                                <span class="glyphicon glyphicon-minus"></span>
+                                             </button>
+                                          </span>
+                                       </div>                                                 
+                                    </div>
                                  </div>
                               </div>
+                              
                            </div>
-                           
-                        </div>
-                     </div>                 
+                        </div>                 
                      <div class="col-lg-8">
                      <div class="form-group">
                         <label class="sr-only" for="transientInput">Transient output</label>
@@ -195,13 +159,19 @@
                         </div>
                      </div>
 
+                     </accordion-group>
+
                   </div>
                </div>
 
+
                <div class="row">
                   <div class="col-lg-12" ng-show="checkAll.skim">
-                     <hr>                                 
-                     <h4>Default Skim configurations:</h4>
+                     <hr>
+                     <accordion-group >
+                     <accordion-heading>
+                        Default Skim configurations:
+                     </accordion-heading>
 
                      <div class="col-lg-4 form-horizontal">
                         <div class="form-inline">
@@ -241,14 +211,17 @@
                         </div>
                      </div>
 
+                     </accordion-group>
                   </div>
                </div>
                 
-
                <div class="row">
                   <div class="col-lg-12" ng-show="checkAll.mini">
                      <hr>
-                     <h4>Default MiniAOD configurations:</h4>
+                     <accordion-group >
+                     <accordion-heading>
+                        Default MiniAOD configurations:
+                     </accordion-heading>
                      
                      <div class="col-lg-4 form-horizontal">                     
                         <div ng-repeat="(id, txt) in allOpt['Default']['mini']">
@@ -283,43 +256,58 @@
                            </div>                                    
                         </div>
                      </div>
+                     </accordion-group>
                   </div>
                </div>
 
-
-
                <div class="row">
-                  <hr>
-                  <div class="col-lg-6">
-                     <h4>Alca configurations:</h4>
-                     <ng-form name="fieldForm">                     
-                        <span class="badge badge-important" style="background-color: red" ng-if="fieldForm.$invalid">Bad JSON formatting</span>
-                        <span class="badge badge-success" style="background-color: green" ng-if="!fieldForm.$invalid">Valid JSON formatting</span>
-                        <inline-editable ng-model="alca"></inline-editable>
-                     </ng-form>
-                  </div>
+                  <div class="col-lg-12">
+                     <hr>
+                     <accordion-group >
+                        <accordion-heading>
+                           Default JSON format configurations
+                        </accordion-heading>
 
-                  <div class="col-lg-6">
-                     <h4>Skim configurations:</h4>
-                     <ng-form name="skimFieldForm">                     
-                        <span class="badge badge-important" style="background-color: red" ng-if="skimFieldForm.$invalid">Bad JSON formatting</span>
-                        <span class="badge badge-success" style="background-color: green" ng-if="!skimFieldForm.$invalid">Valid JSON formatting</span>
-                        <inline-editable ng-model="skim"></inline-editable>
-                     </ng-form>
-                  </div>
+                        <div class="col-lg-6">
+                           <h4>Alca configurations:</h4>
+                           <ng-form name="fieldForm">                     
+                              <span class="badge badge-important" style="background-color: red" ng-if="fieldForm.$invalid">Bad JSON formatting</span>
+                              <span class="badge badge-success" style="background-color: green" ng-if="!fieldForm.$invalid">Valid JSON formatting</span>
+                              <inline-editable ng-model="jsons.alca" key="alca"></inline-editable>
+                              
+                           </ng-form>
+                        </div>
 
-                  <div class="col-lg-6">
-                     <h4>Lumi configurations:</h4>
-                     <ng-form name="lumiFieldForm">                     
-                        <span class="badge badge-important" style="background-color: red" ng-if="lumiFieldForm.$invalid">Bad JSON formatting</span>
-                        <span class="badge badge-success" style="background-color: green" ng-if="!lumiFieldForm.$invalid">Valid JSON formatting</span>
-                        <inline-editable ng-model="lumi"></inline-editable>
-                     </ng-form>
+                        <div class="col-lg-6">
+                           <h4>Skim configurations:</h4>
+                           <ng-form name="skimFieldForm">                     
+                              <span class="badge badge-important" style="background-color: red" ng-if="skimFieldForm.$invalid">Bad JSON formatting</span>
+                              <span class="badge badge-success" style="background-color: green" ng-if="!skimFieldForm.$invalid">Valid JSON formatting</span>
+                              <inline-editable ng-model="jsons.skim" key="skim"></inline-editable>
+                           </ng-form>
+                        </div>
+
+                        <div class="col-lg-6">
+                           <h4>Luminosity filtering:</h4>
+                           <ng-form name="lumiFieldForm">                     
+                              <span class="badge badge-important" style="background-color: red" ng-if="lumiFieldForm.$invalid">Bad JSON formatting</span>
+                              <span class="badge badge-success" style="background-color: green" ng-if="!lumiFieldForm.$invalid">Valid JSON formatting</span>
+                              <inline-editable ng-model="jsons.lumi" key="lumi"></inline-editable>
+                           </ng-form>
+                        </div>
+
+                     </accordion-group>
                   </div>
                </div>
 
             </accordion-group>
             </accordion>
+
+            <div class="row">
+               <div class="col-lg-12">
+                  <h3>Main campaign info:</h3>
+               </div>
+            </div>
 
             <div class="row"> 
                <div class="col-lg-12 h6"></div>
@@ -358,11 +346,11 @@
                      <div class="row">
                         <div class="col-md-12 h4">
                         
-                           Actions: 
+                           Add/Delete steps: 
                            <div class="btn-group">
-                              <label class="btn btn-info" ng-model="check[name].reco" ng-change="checkChange(name, 'reco')" btn-checkbox>Reco</label>
-                              <label class="btn btn-info" ng-model="check[name].skim" ng-change="checkChange(name, 'skim')" btn-checkbox>Skim</label>
-                              <label class="btn btn-info" ng-model="check[name].mini" ng-change="checkChange(name, 'mini')" btn-checkbox>MiniAOD</label>
+                              <label class="btn {{((check[name].reco) ? 'btn-danger' : 'btn-success')}}" ng-model="check[name].reco" ng-change="checkChange(name, 'reco')" btn-checkbox>{{((check[name].reco) ? 'Delete Reco' : 'Add Reco')}}</label>
+                              <label class="btn {{((check[name].skim) ? 'btn-danger' : 'btn-success')}}" ng-model="check[name].skim" ng-change="checkChange(name, 'skim')" btn-checkbox>{{((check[name].skim) ? 'Delete Skim' : 'Add Skim')}}</label>
+                              <label class="btn {{((check[name].mini) ? 'btn-danger' : 'btn-success')}}" ng-model="check[name].mini" ng-change="checkChange(name, 'mini')" btn-checkbox>{{((check[name].mini) ? 'Delete MiniAOD' : 'Add MiniAOD')}}</label>
                            </div>
                         
                            <div class="form-group">
@@ -380,55 +368,59 @@
 
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].reco">
-                              <hr>                                 
-                              <h4>RECO configurations:</h4>
+                              <hr>
+                              <accordion-group >
+                                 <accordion-heading>
+                                    RECO configurations:
+                                 </accordion-heading>
 
-                              <div class="col-lg-4 form-horizontal">
-                                 <div class="form-inline">
-                                    <div ng-repeat="(id, txt) in allOpt[name]['reco']"> <!--recoOpt-->
-                                       <div class="form-group" style="margin-top: 5px"> 
-                                          <div class="col-lg-4" style="width: 100px">{{txt}}:</div>
-                                          <div class="col-lg-8">
-                                             <div class="input-group">
-                                                <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['reco'][txt]">
-                                                <span class="input-group-btn">
-                                                   <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'reco', txt, '')">
-                                                      <span class="glyphicon glyphicon-minus"></span>
-                                                   </button>
-                                                </span>
-                                             </div>                                                 
+                                 <div class="col-lg-4 form-horizontal">
+                                    <div class="form-inline">
+                                       <div ng-repeat="(id, txt) in allOpt[name]['reco']"> <!--recoOpt-->
+                                          <div class="form-group" style="margin-top: 5px"> 
+                                             <div class="col-lg-4" style="width: 100px">{{txt}}:</div>
+                                             <div class="col-lg-8">
+                                                <div class="input-group">
+                                                   <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['reco'][txt]">
+                                                   <span class="input-group-btn">
+                                                      <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'reco', txt, '')">
+                                                         <span class="glyphicon glyphicon-minus"></span>
+                                                      </button>
+                                                   </span>
+                                                </div>                                                 
+                                             </div>
                                           </div>
                                        </div>
+                                       
                                     </div>
-                                    
-                                 </div>
-                              </div>                        
-                              <div class="col-lg-8">
+                                 </div>                        
+                                 <div class="col-lg-8">
 
-                                 <div class="form-group">
-                                    <label class="sr-only" for="transientInput{{name}}">Transient output</label>
-                                    <div class="input-group">
-                                       <div class="input-group-addon">Transient output</div>
-                                       <input type="text" class="form-control" id="transientInput{{name}}" ng-model="data['req'][name]['transient_output']">
+                                    <div class="form-group">
+                                       <label class="sr-only" for="transientInput{{name}}">Transient output</label>
+                                       <div class="input-group">
+                                          <div class="input-group-addon">Transient output</div>
+                                          <input type="text" class="form-control" id="transientInput{{name}}" ng-model="data['req'][name]['transient_output']">
+                                       </div>
+                                    </div> 
+
+                                    <pre style="margin-top: 5px">{{drive[name]['reco']}}</pre>                       
+
+                                    <div class="form-group" style="margin-top: 5px">
+                                       Add/remove extra fields:
+                                      
+                                       <div class="input-group">
+                                          <input type="text" class="form-control" ng-model="tmp_extra[name]['reco']" placeholder="Type extra" />
+                                          <span class="input-group-btn">
+                                             <button class="btn btn-success btn-add" type="button" ng-click="addExtra(name, 'reco', tmp_extra[name]['reco'], '')">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                             </button>
+                                             
+                                          </span>
+                                       </div>                                    
                                     </div>
-                                 </div> 
-
-                                 <pre style="margin-top: 5px">{{drive[name]['reco']}}</pre>                       
-
-                                 <div class="form-group" style="margin-top: 5px">
-                                    Add/remove extra fields:
-                                   
-                                    <div class="input-group">
-                                       <input type="text" class="form-control" ng-model="tmp_extra[name]['reco']" placeholder="Type extra" />
-                                       <span class="input-group-btn">
-                                          <button class="btn btn-success btn-add" type="button" ng-click="addExtra(name, 'reco', tmp_extra[name]['reco'], '')">
-                                             <span class="glyphicon glyphicon-plus"></span>
-                                          </button>
-                                          
-                                       </span>
-                                    </div>                                    
                                  </div>
-                              </div>
+                              </accordion-group>
 
                            </div>
                         </div>
@@ -436,81 +428,90 @@
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].skim">
                               <hr>
-                              <h4>Skim configurations:</h4>
+                              <accordion-group >
+                                 <accordion-heading>
+                                    Skim configurations:
+                                 </accordion-heading>
 
-                              <div class="col-lg-4 form-horizontal">
-                                 <div ng-repeat="(id, txt) in allOpt[name]['skim']">
-                                    <div class="form-group" style="margin-top: 5px">                     
-                                       <div class="col-lg-4" style="width: 100px">{{txt}}:</div>
-                                       <div class="col-lg-8">
-                                          <div class="input-group">
-                                             <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['skim'][txt]">
-                                             <span class="input-group-btn">
-                                                <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'skim', txt, '')">
-                                                   <span class="glyphicon glyphicon-minus"></span>
-                                                </button>
-                                             </span>
+                                 <div class="col-lg-4 form-horizontal">
+                                    <div ng-repeat="(id, txt) in allOpt[name]['skim']">
+                                       <div class="form-group" style="margin-top: 5px">                     
+                                          <div class="col-lg-4" style="width: 100px">{{txt}}:</div>
+                                          <div class="col-lg-8">
+                                             <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['skim'][txt]">
+                                                <span class="input-group-btn">
+                                                   <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'skim', txt, '')">
+                                                      <span class="glyphicon glyphicon-minus"></span>
+                                                   </button>
+                                                </span>
+                                             </div>
                                           </div>
                                        </div>
                                     </div>
                                  </div>
-                              </div>
 
-                              <div class="col-lg-8">                       
-                                 <pre style="margin-top: 5px">{{drive[name]['skim']}}</pre>
-                                 <div class="form-group" style="margin-top: 5px">
-                                    Add/remove extra fields:
-                          
-                                    <div class=" input-group">
-                                       <input type="text" class="form-control" ng-model="tmp_extra[name]['skim']" placeholder="Type extra" />
-                                       <span class="input-group-btn">
-                                          <button class="btn btn-success btn-add" type="button" ng-click="addExtra(name, 'skim', tmp_extra[name]['skim'], '')">
-                                             <span class="glyphicon glyphicon-plus"></span>
-                                          </button>
-                                       </span>
-                                    </div>                                    
+                                 <div class="col-lg-8">                       
+                                    <pre style="margin-top: 5px">{{drive[name]['skim']}}</pre>
+                                    <div class="form-group" style="margin-top: 5px">
+                                       Add/remove extra fields:
+                             
+                                       <div class=" input-group">
+                                          <input type="text" class="form-control" ng-model="tmp_extra[name]['skim']" placeholder="Type extra" />
+                                          <span class="input-group-btn">
+                                             <button class="btn btn-success btn-add" type="button" ng-click="addExtra(name, 'skim', tmp_extra[name]['skim'], '')">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                             </button>
+                                          </span>
+                                       </div>                                    
+                                    </div>
                                  </div>
-                              </div>
+                              </accordion-group>
                            </div>
                         </div>
 
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].mini">
                               <hr>
-                              <h4>MiniAOD configurations:</h4>
-                              <div class="col-lg-4 form-horizontal">
-                                 <div ng-repeat="(id, txt) in allOpt[name]['mini']">
-                                    <div class="form-group" style="margin-top: 5px">                     
-                                       <div class="col-lg-4" style="width: 100px">{{txt}}:</div>
-                                       <div class="col-lg-8">
-                                          <div class="input-group">
-                                             <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['mini'][txt]">
-                                             <span class="input-group-btn">
-                                                <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'mini', txt, '')">
-                                                   <span class="glyphicon glyphicon-minus"></span>
-                                                </button>
-                                             </span>
-                                          </div>
-                                       </div>                                       
+                              <accordion-group >
+                                 <accordion-heading>
+                                    MiniAOD configurations:
+                                 </accordion-heading>
+
+                                 <div class="col-lg-4 form-horizontal">
+                                    <div ng-repeat="(id, txt) in allOpt[name]['mini']">
+                                       <div class="form-group" style="margin-top: 5px">                     
+                                          <div class="col-lg-4" style="width: 100px">{{txt}}:</div>
+                                          <div class="col-lg-8">
+                                             <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['mini'][txt]">
+                                                <span class="input-group-btn">
+                                                   <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'mini', txt, '')">
+                                                      <span class="glyphicon glyphicon-minus"></span>
+                                                   </button>
+                                                </span>
+                                             </div>
+                                          </div>                                       
+                                       </div>
                                     </div>
                                  </div>
-                              </div>
 
-                              <div class="col-lg-8">                       
-                                 <pre style="margin-top: 5px">{{drive[name]['mini']}}</pre>
-                                 <div class="form-group" style="margin-top: 5px">
-                                    Add/remove extra fields:
-                            
-                                    <div class=" input-group">
-                                       <input type="text" class="form-control" ng-model="tmp_extra[name]['mini']" placeholder="Type extra" />
-                                       <span class="input-group-btn">
-                                          <button class="btn btn-success btn-add" type="button" ng-click="addExtra(name, 'mini', tmp_extra[name]['mini'], '')">
-                                             <span class="glyphicon glyphicon-plus"></span>
-                                          </button>
-                                       </span>
-                                    </div>                                    
+                                 <div class="col-lg-8">                       
+                                    <pre style="margin-top: 5px">{{drive[name]['mini']}}</pre>
+                                    <div class="form-group" style="margin-top: 5px">
+                                       Add/remove extra fields:
+                               
+                                       <div class=" input-group">
+                                          <input type="text" class="form-control" ng-model="tmp_extra[name]['mini']" placeholder="Type extra" />
+                                          <span class="input-group-btn">
+                                             <button class="btn btn-success btn-add" type="button" ng-click="addExtra(name, 'mini', tmp_extra[name]['mini'], '')">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                             </button>
+                                          </span>
+                                       </div>                                    
+                                    </div>
                                  </div>
-                              </div>
+                              </accordion-group>
                            </div>
                         </div>
 
