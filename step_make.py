@@ -24,6 +24,7 @@ class MasterConfMaker:
         """
         method to form configuration files
         """
+        __id = self.data['data']['_id']
         GT = self.data['data']['GT']
         __release = self.data['data']['CMSSW']
         drive = self.data['drive']
@@ -81,7 +82,7 @@ class MasterConfMaker:
             #ds = ds.split("/")[1]
             #dataset='/%s/Run%s-v1/RAW' % (ds, era)
 
-            master.write('[Winter53%s%sPrio%d]\n' % (era, ds.split("/")[1], prio))
+            master.write('[%s%s%sPrio%d]\n' % (__id, era, ds.split("/")[1], prio))
             master.write('campaign=Run%s\n' % (era))
             master.write('priority=%d\n' % (prio)) 
             master.write('dset_run_dict={"%s" : %s}\n' % (ds, json.dumps(lumi_list.keys())))
@@ -89,7 +90,7 @@ class MasterConfMaker:
             if (cfg != ''):
                 master.write('cfg_path=%s\n' % (cfg))
                 transient_output = self.data['data']['req'][ds]['transient_output']
-                if (transient_output != ''):
+                if (transient_output != '' and transient_output != "[]"):
                     master.write('transient_output=%s\n' % (transient_output))
 
             if skim_file!='':
