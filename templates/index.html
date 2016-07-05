@@ -107,9 +107,11 @@
                <div class="row">
                   <div class="col-lg-12" ng-show="checkAll.reco">
                      <hr>
-                     <accordion-group >
+                     <accordion-group is-open="secondStatus.open">
                         <accordion-heading>
                            Default RECO configurations:
+                           <!-----------modification here: adding glyphicons to look more intuitive------------------>
+                           <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': secondStatus.open, 'glyphicon-chevron-right': !secondStatus.open}"></i>
                         </accordion-heading>
                         <hr>                                 
                         <h4>Default RECO configurations:</h4>
@@ -168,9 +170,10 @@
                <div class="row">
                   <div class="col-lg-12" ng-show="checkAll.skim">
                      <hr>
-                     <accordion-group >
+                     <accordion-group is-open="thirdStatus.open">
                      <accordion-heading>
                         Default Skim configurations:
+                        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': thirdStatus.open, 'glyphicon-chevron-right': !thirdStatus.open}"></i>
                      </accordion-heading>
 
                      <div class="col-lg-4 form-horizontal">
@@ -218,9 +221,10 @@
                <div class="row">
                   <div class="col-lg-12" ng-show="checkAll.mini">
                      <hr>
-                     <accordion-group >
+                     <accordion-group is-open="fourthStatus.open">
                      <accordion-heading>
                         Default MiniAOD configurations:
+                        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': fourthStatus.open, 'glyphicon-chevron-right': !fourthStatus.open}"></i>
                      </accordion-heading>
                      
                      <div class="col-lg-4 form-horizontal">                     
@@ -263,9 +267,10 @@
                <div class="row">
                   <div class="col-lg-12">
                      <hr>
-                     <accordion-group >
+                     <accordion-group is-open="fifthStatus.open">
                         <accordion-heading>
                            Default JSON format configurations
+                           <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': fifthStatus.open, 'glyphicon-chevron-right': !fifthStatus.open}"></i>
                         </accordion-heading>
 
                         <div class="col-lg-6">
@@ -369,9 +374,10 @@
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].reco">
                               <hr>
-                              <accordion-group >
+                              <accordion-group is-open="secondStatus.open">
                                  <accordion-heading>
                                     RECO configurations:
+                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': secondStatus.open, 'glyphicon-chevron-right': !secondStatus.open}"></i>
                                  </accordion-heading>
 
                                  <div class="col-lg-4 form-horizontal">
@@ -428,9 +434,10 @@
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].skim">
                               <hr>
-                              <accordion-group >
+                              <accordion-group  is-open="thirdStatus.open">
                                  <accordion-heading>
                                     Skim configurations:
+                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': thirdStatus.open, 'glyphicon-chevron-right': !thirdStatus.open}"></i>
                                  </accordion-heading>
 
                                  <div class="col-lg-4 form-horizontal">
@@ -473,9 +480,10 @@
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].mini">
                               <hr>
-                              <accordion-group >
+                              <accordion-group  is-open="fourthStatus.open">
                                  <accordion-heading>
                                     MiniAOD configurations:
+                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': fourthStatus.open, 'glyphicon-chevron-right': !fourthStatus.open}"></i>
                                  </accordion-heading>
 
                                  <div class="col-lg-4 form-horizontal">
