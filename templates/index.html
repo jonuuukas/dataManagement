@@ -24,10 +24,12 @@
 
                   <input type="text" ng-model="data['_id']" typeahead="elem for elem in list | filter:$viewValue | limitTo:10" class="form-control">
 
-                  <button type="submit" class="btn btn-primary" ng-if="inTheList" ng-click="loadData()">Load data <i class="fa fa-arrow-up" aria-hidden="true"></i></button>
-                  <button type="submit" class="btn btn-primary" ng-if="!doc['submitted'] && inTheList" ng-click="updateDoc()">Update doc <i class="fa fa-floppy-o" aria-hidden="true"></i></button>
-                  <button type="submit" class="btn btn-primary" ng-if="!inTheList" ng-click="saveDoc()">Save doc <i class="fa fa-floppy-o" aria-hidden="true"></i></button>
-                  <button type="submit" class="btn btn-danger" ng-if="!doc['submitted'] && inTheList" ng-click="submitCampaign()">Submit campaign <i class="fa fa-archive" aria-hidden="true"></i></button> 
+                  <button type="submit" tooltip="Restore the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="inTheList" ng-click="loadData()">Load data <i class="fa fa-arrow-up" aria-hidden="true"></i></button>
+                  <button type="submit" tooltip="Save the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="!doc['submitted'] && inTheList" ng-click="updateDoc()">Update doc <i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+                  <button type="submit"  tooltip="Save the current campaign" tooltip-placement="bottom"  class="btn btn-primary" ng-if="!inTheList" ng-click="saveDoc()">Save doc <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+
+
+                  <button type="submit" tooltip="WARNING: You can only submit the campaign once. Any changes will have to be saved to another campaign" tooltip-placement="bottom" class="btn btn-danger" ng-if="!doc['submitted'] && inTheList" ng-click="submitCampaign()">Submit campaign <i class="fa fa-archive" aria-hidden="true"></i></button> 
 
                   <img ng-show="working_on" ng-src="https://twiki.cern.ch/twiki/pub/TWiki/TWikiDocGraphics/processing-bg.gif" src="https://twiki.cern.ch/twiki/pub/TWiki/TWikiDocGraphics/processing-bg.gif" class="ng-hide">
                   
