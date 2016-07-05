@@ -13,6 +13,10 @@ from flask import Flask, send_from_directory, redirect, Response, make_response,
 from subprocess import Popen, PIPE
 app = Flask(__name__)
 
+
+#comment for testing purposes. sry if I left it here
+
+
 WORK_DIR = '/stuff'
 couch = CouchDBInterface()
 cred = '/afs/cern.ch/user/m/mliutkut/private/PdmVService.txt'
