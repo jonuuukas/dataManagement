@@ -535,10 +535,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         }
       }
 
-      //$scope.alertMsg = {error : false, msg : "Action was successful.", show : true};
+      $scope.alertMsg = {error : false, msg : "Action was successful.", show : true};
     }).error(function(status){
-      //$scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
-      //console.log("error:" + status);
+      $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
+      console.log("error:" + status);
     }); 
   };
 
