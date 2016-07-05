@@ -125,8 +125,8 @@
                                        <div class="input-group">
                                           <input type="text" class="form-control" placeholder="{{txt}}" ng-model="defCon['reco'][txt]">
                                           <span class="input-group-btn">
-                                             <button class="btn btn-danger btn-add" type="button" ng-click="removeDefExtra('Default', 'reco', txt, '')">
-                                                <span class="glyphicon glyphicon-minus"></span>
+                                             <button class="btn btn-warning btn-add" type="button" ng-click="defCon['reco'][txt] = null">
+                                                <span class="glyphicon glyphicon-remove"></span>
                                              </button>
                                           </span>
                                        </div>                                                 
@@ -185,8 +185,8 @@
                                     <div class="input-group">
                                        <input type="text" class="form-control" placeholder="{{txt}}" ng-model="defCon['skim'][txt]">
                                        <span class="input-group-btn">
-                                          <button class="btn btn-danger btn-add" type="button" ng-click="removeDefExtra('Default', 'skim', txt, '')">
-                                             <span class="glyphicon glyphicon-minus"></span>
+                                          <button class="btn btn-warning btn-add" type="button" ng-click="defCon['skim'][txt] = null">
+                                             <span class="glyphicon glyphicon-remove"></span>
                                           </button>
                                        </span>
                                     </div>                                                 
@@ -235,8 +235,8 @@
                                  <div class="input-group">
                                     <input type="text" class="form-control" placeholder="{{txt}}" ng-model="defCon['mini'][txt]">
                                     <span class="input-group-btn">
-                                       <button class="btn btn-danger btn-add" type="button" ng-click="removeDefExtra('Default', 'mini', txt, '')">
-                                          <span class="glyphicon glyphicon-minus"></span>
+                                       <button class="btn btn-warning btn-add" type="button" ng-click="defCon['mini'][txt] = null">
+                                          <span class="glyphicon glyphicon-remove"></span>
                                        </button>
                                     </span>
                                  </div>
@@ -389,8 +389,8 @@
                                                 <div class="input-group">
                                                    <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['reco'][txt]">
                                                    <span class="input-group-btn">
-                                                      <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'reco', txt, '')">
-                                                         <span class="glyphicon glyphicon-minus"></span>
+                                                      <button class="btn btn-warning btn-add" type="button" ng-click="data['req'][name]['action']['reco'][txt]=null">
+                                                         <span class="glyphicon glyphicon-remove"></span>
                                                       </button>
                                                    </span>
                                                 </div>                                                 
@@ -448,8 +448,8 @@
                                              <div class="input-group">
                                                 <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['skim'][txt]">
                                                 <span class="input-group-btn">
-                                                   <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'skim', txt, '')">
-                                                      <span class="glyphicon glyphicon-minus"></span>
+                                                   <button class="btn btn-warning btn-add" type="button" ng-click="data['req'][name]['action']['skim'][txt] = null">
+                                                      <span class="glyphicon glyphicon-remove"></span>
                                                    </button>
                                                 </span>
                                              </div>
@@ -494,8 +494,8 @@
                                              <div class="input-group">
                                                 <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['mini'][txt]">
                                                 <span class="input-group-btn">
-                                                   <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'mini', txt, '')">
-                                                      <span class="glyphicon glyphicon-minus"></span>
+                                                   <button class="btn btn-warning btn-add" type="button" ng-click="data['req'][name]['action']['mini'][txt] = null">
+                                                      <span class="glyphicon glyphicon-remove"></span>
                                                    </button>
                                                 </span>
                                              </div>
