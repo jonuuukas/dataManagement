@@ -574,7 +574,23 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       console.log("error: " + status);
     });
   };
-
+  //======================Copy to clipboard button for the Full JSON fields===================================
+  $scope.copyToClipboard = function(text)
+  {
+    var textArea = document.createElement("textarea");
+    textArea.style = "none";
+    textArea.value = angular.toJson(text);
+    console.log(angular.toJson(text));
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+                var successful = document.execCommand('copy');
+                if (!successful) throw successful;
+            } catch (err) {
+                console.log("failed to copy", text);
+            }
+    document.body.removeChild(textArea);
+  };
   //==================WATCH===================//
 
   $scope.$watch("data['req']", function(newValue, oldValue) {
@@ -689,18 +705,3 @@ myApp.directive("inlineEditable", function () {
     }
 });
 
-//======================Tooltip directive=======================//
-myApp.directive('tooltip', function(){
-    return {
-        restrict: 'A',
-        link: function(scope, element, attrs){
-            $(element).hover(function(){
-                // on mouseenter
-                $(element).tooltip('show');
-            }, function(){
-                // on mouseleave
-                $(element).tooltip('hide');
-            });
-        }
-    };
-});

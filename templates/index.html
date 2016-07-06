@@ -539,8 +539,8 @@
                   Full JSON
                   <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                </accordion-heading>
-               <pre>{{data | json}}</pre>
-               <pre>{{drive | json}}</pre>
+               <pre><button class="btn btn-primary" style="float:right" ng-click="copyToClipboard(data)" tooltip="Copy to clipboard" tooltip-placement="up"><i class="fa fa-clipboard" aria-hidden="true"></i></button>{{data | json}}</pre>
+               <pre><button class="btn btn-primary" style="float:right" ng-click="copyToClipboard(drive)" tooltip="Copy to clipboard" tooltip-placement="up"><i class="fa fa-clipboard" aria-hidden="true"></i></button>{{drive | json}}</pre>
             </accordion-group>
          </accordion>         
       </div>
