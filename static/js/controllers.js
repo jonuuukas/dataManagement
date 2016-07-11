@@ -1,4 +1,5 @@
 var myApp = angular.module('myApp', ['ui.bootstrap']);
+var loader = angular.module('loader', ['angular-loading-bar']);
 myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
 
@@ -555,7 +556,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         '_id': $scope.data['_id'],
         '_rev' : $scope.doc['_rev'],
         'CMSSW' : $scope.data['CMSSW']
-    }}).success(function(data, status){
+    }    
+      }).success(function(data, status){
       $scope.working_on = false;
       if (data == '0'){
         $scope.alertMsg = {error : false, msg : "Submit was successful.", show : true};
@@ -567,7 +569,6 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.alertMsg = {error : true, msg : "Submit was unsuccessful. Something went wrong, better check the logs!", show : true};
         console.log("Something went wrong" + data +" status: " + status);
       }
-      console.log("success" + status);
     }).error(function(status){
       $scope.alertMsg = {error : true, msg : "Action was unsuccessful", show : true};
       $scope.working_on = false;

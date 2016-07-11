@@ -13,11 +13,7 @@ from flask import Flask, send_from_directory, redirect, Response, make_response,
 from subprocess import Popen, PIPE
 app = Flask(__name__)
 
-
-#comment for testing purposes. sry if I left it here
-
-
-WORK_DIR = '/stuff'
+WORK_DIR = '/afs/cern.ch/user/j/jsiderav/public/dataManagement/stuff'
 couch = CouchDBInterface()
 cred = '/afs/cern.ch/user/m/mliutkut/private/PdmVService.txt'
 
@@ -76,9 +72,12 @@ def get_bash(__release, _id, __scram):
     comm += "scram p CMSSW %s\n" % (__release)
     comm += "cd %s/src\n" % (__release)
     comm += "eval `scram runtime -sh`\n"
-    comm += "git-cms-addpkg Configuration/Skimming\n"
-    comm += "wget https://raw.githubusercontent.com/cms-PdmV/dataManagement/master/step_make.py\n"
-    comm += "wget https://raw.githubusercontent.com/cms-PdmV/dataManagement/master/couchdb_interface.py\n"
+    comm += "cmsenv\n"
+    comm += "git cms-addpkg Configuration/Skimming\n"
+    #####################LOCAL REPO IS CURRENTLY BEING USED FOR THE WGET LINES#################
+    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
+    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
+    ######################################SEE ABOVE, NOOB######################################
     comm += "python step_make.py --in=%s\n" % (_id)
     #-------------For wmcontrol.py---------------------
     comm += "source /afs/cern.ch/cms/PPD/PdmV/tools/wmclient/current/etc/wmclient.sh\n" 
