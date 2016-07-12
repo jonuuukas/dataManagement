@@ -12,11 +12,15 @@ from couchdb_interface import CouchDBInterface
 from flask import Flask, send_from_directory, redirect, Response, make_response, request
 from subprocess import Popen, PIPE
 app = Flask(__name__)
-
+###original
 WORK_DIR = '/afs/cern.ch/user/j/jsiderav/public/dataManagement/stuff'
 couch = CouchDBInterface()
-cred = '/afs/cern.ch/user/m/mliutkut/private/PdmVService.txt'
-
+cred = '/afs/cern.ch/user/j/jsiderav/private/PdmVService.txt'
+###
+###Replaced with below
+# WORK_DIR = '/home/dataManagement/stuff'
+# couch = CouchDBInterface()
+# cred = '/afs/cern.ch/user/j/jsiderav/private/PdmVService.txt'
 @app.route("/", methods=["GET", "POST"])
 def hello():
     return send_from_directory('templates', 'index.html')
@@ -69,7 +73,7 @@ def get_bash(__release, _id, __scram):
     comm += "cd %s\n" %WORKDIR
     comm += "export SCRAM_ARCH=%s\n" %(__scram)
     comm += "source /afs/cern.ch/cms/cmsset_default.sh\n"
-    comm += "scram p CMSSW %s\n" % (__release)
+    comm += "scram project %s\n" % (__release)
     comm += "cd %s/src\n" % (__release)
     comm += "eval `scram runtime -sh`\n"
     comm += "cmsenv\n"
@@ -111,8 +115,9 @@ def submit_campaign():
     __exec_file.close()
     log_file = file('log.txt','w')
     err_file = file('log2.txt','w')
+    ###changing close_fds to True
     proc = subprocess.Popen(['bash', 'tmp_execute.sh'],
-                        stdout=log_file,stderr=err_file)
+                        stdout=log_file,stderr=err_file,close_fds=True)
     __ret_code = proc.wait()
     log_file.close()
     err_file.close()
