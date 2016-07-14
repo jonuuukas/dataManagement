@@ -497,7 +497,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.inTheList = true;
       console.log("success" + data + " " + status);
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Action was successful.", show : true};
+      $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
       $scope.working_on = false;      
       console.log("error:" + status);
     });  
