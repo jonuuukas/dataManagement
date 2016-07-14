@@ -9,7 +9,7 @@ import datetime
 import xml.dom.minidom
 from couchdb_interface import CouchDBInterface
 
-from flask import Flask, send_from_directory, redirect, Response, make_response, request
+from flask import Flask, send_from_directory, redirect, Response, make_response, request, jsonify
 from subprocess import Popen, PIPE
 app = Flask(__name__)
 ###original
@@ -23,16 +23,23 @@ cred = '/afs/cern.ch/user/j/jsiderav/private/PdmVService.txt'
 # cred = '/afs/cern.ch/user/j/jsiderav/private/PdmVService.txt'
 @app.route("/", methods=["GET", "POST"])
 def hello():
-"""
-Opening function that directs to index.html
-"""
+    """
+    Opening function that directs to index.html
+    """
     return send_from_directory('templates', 'index.html')
-
+@app.route('/api/help', methods = ['GET'])
+def help():
+    """Print available functions."""
+    func_list = {}
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint != 'static':
+            func_list[rule.rule] = app.view_functions[rule.endpoint].__doc__
+    return jsonify(func_list)
 def get_scram(__release):
-"""
-By the given __release version checks with the scram architecture versions'
-and returns the architecture name if found
-"""
+    """
+    By the given __release version checks with the scram architecture versions'
+    and returns the architecture name if found
+    """
     scram = ''
     xml_data = xml.dom.minidom.parseString(os.popen("curl -s --insecure 'https://cmssdt.cern.ch/SDT/cgi-bin/ReleasesXML/?anytype=1'").read())
     
@@ -47,10 +54,10 @@ and returns the architecture name if found
 
 @app.route('/load_data', methods=["POST"])
 def load_data():
-"""
-Communicates with the CouchDB and returns the object
-according to it's _id as a JSON
-"""
+    """
+    Communicates with the CouchDB and returns the object
+    according to it's _id as a JSON
+    """
     data = json.loads(request.get_data())
     _id = data['_id']
     doc_data = couch.get_file(_id)
@@ -58,18 +65,18 @@ according to it's _id as a JSON
 
 @app.route('/get_all_docs', methods=["GET"])
 def get_all_docs():
-"""
-Used in saveDocs() function to get all docs and later for the 
-object to be pushed in to the data list
-"""
+    """
+    Used in saveDocs() function to get all docs and later for the 
+    object to be pushed in to the data list
+    """
     info = couch.get_all_docs()
     return json.dumps(info)
 
 @app.route('/update_file', methods=["POST"])
 def update_file():
-"""
-Gets the object from the browser and updates it in the CouchDB
-"""
+    """
+    Gets the object from the browser and updates it in the CouchDB
+    """
     data = json.loads(request.get_data())
     _id = data['_id']
     _rev = data['_rev']
@@ -79,18 +86,18 @@ Gets the object from the browser and updates it in the CouchDB
 
 @app.route('/save_doc', methods=["POST"])
 def save_doc():
-"""
-Puts a newly created object to the CouchDB
-"""
+    """
+    Puts a newly created object to the CouchDB
+    """
     data = request.get_data()
     doc_data = couch.put_file(data)
     return json.dumps(doc_data)
 
 def get_bash(__release, _id, __scram):
-"""
-Returns the stuff/tmp_execute.sh script that communicates with various CMSSW functions
-according to the current campaign submit data
-"""
+    """
+    Returns the stuff/tmp_execute.sh script that communicates with various CMSSW functions
+    according to the current campaign submit data
+    """
     #------------To checkout CMSSW---------------------
     WORKDIR = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M')
     comm = "#!/bin/bash\n"
@@ -120,11 +127,11 @@ according to the current campaign submit data
 
 @app.route('/submit_campaign', methods=["POST"])
 def submit_campaign():
-"""
-Executes the submit button by updating the current campaign, creating/executing the script in get_bash()
-Logs of the process can be found in the WORK_DIR variable location and a log is also uploaded to the CouchDB
-together with the object
-"""
+    """
+    Executes the submit button by updating the current campaign, creating/executing the script in get_bash()
+    Logs of the process can be found in the WORK_DIR variable location and a log is also uploaded to the CouchDB
+    together with the object
+    """
     data = json.loads(request.get_data())
 
     __release = data['CMSSW']
