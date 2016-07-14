@@ -1,5 +1,5 @@
 # Data management application
-```javascript
+```json
 {
   "/": "\n    Opening function that directs to index.html\n    ", 
   "/api/help": "Print available functions.", 
