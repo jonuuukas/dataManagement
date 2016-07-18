@@ -592,6 +592,40 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
             }
     document.body.removeChild(textArea);
   };
+  //=======Get autoSkim matrix and puts into the input field=====//
+  $scope.getSkimMatrixValue = function ()
+  {
+    $http({
+      method: 'POST', 
+      url: 'get_skim_matrix_value', 
+      data: {
+        'CMSSW' : $scope.data['CMSSW']
+    }
+  }).success(function(data,status){
+      console.log("success on click " + angular.toJson(data));
+      $scope.jsons.skim = data;
+    }).error(function(status){
+      console.log("unsuccessful on click " + status);
+    });
+
+  };
+  //=======Get autoSkim matrix and puts into the input field=====//
+  $scope.getAlCaMatrixValue = function ()
+  {
+    $http({
+      method: 'POST', 
+      url: 'get_alca_matrix_value', 
+      data: {
+        'CMSSW' : $scope.data['CMSSW']
+    }
+  }).success(function(data,status){
+      console.log("success on click " + angular.toJson(data));
+      $scope.jsons.alca = data;
+    }).error(function(status){
+      console.log("unsuccessful on click " + status);
+    });
+
+  };
   //==================WATCH===================//
 
   $scope.$watch("data['req']", function(newValue, oldValue) {

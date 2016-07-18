@@ -278,17 +278,21 @@
 
                         <div class="col-lg-6">
                            <h4>Alca configurations:</h4>
-                           <ng-form name="fieldForm">                     
+                           <ng-form name="fieldForm">     
+                              <button class=" btn btn-success" ng-click="getAlCaMatrixValue()" tooltip="Uploads the AlCa matrix based on the given version. Might not work on some versions and return nothing" tooltip-placement="up">
+                              Get AlCa Matrix</button>                                  
                               <span class="badge badge-important" style="background-color: red" ng-if="fieldForm.$invalid">Bad JSON formatting</span>
                               <span class="badge badge-success" style="background-color: green" ng-if="!fieldForm.$invalid">Valid JSON formatting</span>
                               <inline-editable ng-model="jsons.alca" key="alca"></inline-editable>
                               
                            </ng-form>
+
                         </div>
 
                         <div class="col-lg-6">
                            <h4>Skim configurations:</h4>
-                           <ng-form name="skimFieldForm">                     
+                           <ng-form name="skimFieldForm">  
+                              <button class=" btn btn-success" ng-click="getSkimMatrixValue()" tooltip="Uploads the Skim matrix based on the given version. Might not work on some versions and return nothing" tooltip-placement="up">Get Skim Matrix</button>                                   
                               <span class="badge badge-important" style="background-color: red" ng-if="skimFieldForm.$invalid">Bad JSON formatting</span>
                               <span class="badge badge-success" style="background-color: green" ng-if="!skimFieldForm.$invalid">Valid JSON formatting</span>
                               <inline-editable ng-model="jsons.skim" key="skim"></inline-editable>

@@ -7,6 +7,7 @@ import subprocess
 import sys
 import datetime
 import xml.dom.minidom
+import imp
 from couchdb_interface import CouchDBInterface
 
 from flask import Flask, send_from_directory, redirect, Response, make_response, request, jsonify
@@ -84,6 +85,36 @@ def update_file():
     doc_data = couch.update_file(_id, doc, _rev)
     return json.dumps(doc_data)
 
+@app.route("/get_skim_matrix_value", methods=["GET", "POST"])
+def get_skim_matrix_val():
+    """
+    to be written some day!!!!!!!!!!!!!!!!!!!!!!
+    """
+    file = "temporarySkim.py"
+    data = json.loads(request.get_data())
+    url = "https://raw.githubusercontent.com/cms-sw/cmssw/"+data['CMSSW']+"/Configuration/Skimming/python/autoSkim.py"
+    response = urllib2.urlopen(url)
+    fh = open(file, 'w')
+    fh.write(response.read())
+    fh.close()
+    temp = imp.load_source("matrix","temporarySkim.py")
+    return json.dumps(temp.autoSkim)
+
+@app.route("/get_alca_matrix_value", methods=["GET", "POST"])
+def get_alca_matrix_val():
+    """
+    to be written some day!!!!!!!!!!!!!!!!!!!!!!
+    """
+    file = "temporaryAlca.py"
+    data = json.loads(request.get_data())
+    url = "https://raw.githubusercontent.com/cms-sw/cmssw/"+data['CMSSW']+"/Configuration/AlCa/python/autoAlca.py"
+    response = urllib2.urlopen(url)
+    fh = open(file, 'w')
+    fh.write(response.read())
+    fh.close()
+    temp2 = imp.load_source("matrix","temporaryAlca.py")
+    return json.dumps(temp2.AlCaRecoMatrix)
+
 @app.route('/save_doc', methods=["POST"])
 def save_doc():
     """
@@ -109,18 +140,26 @@ def get_bash(__release, _id, __scram):
     comm += "cd %s/src\n" % (__release)
     comm += "eval `scram runtime -sh`\n"
     comm += "cmsenv\n"
-    comm += "git cms-addpkg Configuration/Skimming\n"
+    # comm += "mkdir Configuration\n"
+    # comm += "mkdir Skimming\n"
+    # comm += "cd Configuration/Skimming\n"
+    # comm += "wget https://raw.githubusercontent.com/cms-sw/cmssw/CMSSW_8_0_1/Configuration/Skimming/python/autoSkim.py\n"
+    # comm += "git cms-addpkg Configuration/Skimming\n"
     #####################LOCAL REPO IS CURRENTLY BEING USED FOR THE WGET LINES#################
     comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
     comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
+    comm += "wget https://raw.githubusercontent.com/cms-sw/cmssw/%s/Configuration/Skimming/python/autoSkim.py\n" %(__release)
     ######################################SEE ABOVE, NOOB######################################
     comm += "python step_make.py --in=%s\n" % (_id)
     #-------------For wmcontrol.py---------------------
     comm += "source /afs/cern.ch/cms/PPD/PdmV/tools/wmclient/current/etc/wmclient.sh\n" 
     comm += "export PATH=/afs/cern.ch/cms/PPD/PdmV/tools/wmcontrol_testful:${PATH}\n"
     comm += "cat %s | voms-proxy-init -voms cms -pwstdin\n" %(cred)
+    comm += "echo 'executing scram runtime'\n"
     comm += "eval `scram runtime -sh`\n"
+    comm += "echo 'executing export'\n"
     comm += "export X509_USER_PROXY=$(voms-proxy-info --path)\n"
+    comm += "echo 'executing step wmcontrol.py'\n"
     comm += "wmcontrol.py --wmtest --req_file=master.conf\n"
     #--------------------------------------------------
     return comm 
