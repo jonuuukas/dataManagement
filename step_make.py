@@ -31,7 +31,7 @@ class MasterConfMaker:
         check = self.data['check']
         lumi_list = self.data['lumi']
         era = self.data['data']['era']
-        #del drive['Default']
+        del drive['Default']
         
         #make master config header
         master = file('master.conf','w')
