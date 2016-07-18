@@ -88,7 +88,8 @@ def update_file():
 @app.route("/get_skim_matrix_value", methods=["GET", "POST"])
 def get_skim_matrix_val():
     """
-    to be written some day!!!!!!!!!!!!!!!!!!!!!!
+    Downloads the autoSkim matrix from the Git repo and passes it to Angular controller which
+    updates the text field
     """
     file = "temporarySkim.py"
     data = json.loads(request.get_data())
@@ -103,7 +104,8 @@ def get_skim_matrix_val():
 @app.route("/get_alca_matrix_value", methods=["GET", "POST"])
 def get_alca_matrix_val():
     """
-    to be written some day!!!!!!!!!!!!!!!!!!!!!!
+    Downloads the autoAlca matrix from the Git repo and passes it to Angular controller which
+    updates the text field
     """
     file = "temporaryAlca.py"
     data = json.loads(request.get_data())
