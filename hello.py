@@ -4,7 +4,7 @@ import pwd
 import os.path
 import urllib2
 import subprocess
-import sys
+import sys  
 import datetime
 import xml.dom.minidom
 import imp
@@ -140,17 +140,17 @@ def get_bash(__release, _id, __scram):
     comm += "source /afs/cern.ch/cms/cmsset_default.sh\n"
     comm += "scram project %s\n" % (__release)
     comm += "cd %s/src\n" % (__release)
-    comm += "eval `scram runtime -sh`\n"
     comm += "cmsenv\n"
+    # comm += "git cms-addpkg Configuration/Skimming\n"
+    comm += "eval `scram runtime -sh`\n"
     # comm += "mkdir Configuration\n"
     # comm += "mkdir Skimming\n"
     # comm += "cd Configuration/Skimming\n"
     # comm += "wget https://raw.githubusercontent.com/cms-sw/cmssw/CMSSW_8_0_1/Configuration/Skimming/python/autoSkim.py\n"
-    # comm += "git cms-addpkg Configuration/Skimming\n"
     #####################LOCAL REPO IS CURRENTLY BEING USED FOR THE WGET LINES#################
     comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
     comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
-    comm += "wget https://raw.githubusercontent.com/cms-sw/cmssw/%s/Configuration/Skimming/python/autoSkim.py\n" %(__release)
+    comm += "wget https://raw.githubusercontent.com/cms-sw/cmssw/CMSSW_5_3_7/Configuration/DataProcessing/python/Reco.py\n"
     ######################################SEE ABOVE, NOOB######################################
     comm += "python step_make.py --in=%s\n" % (_id)
     #-------------For wmcontrol.py---------------------
