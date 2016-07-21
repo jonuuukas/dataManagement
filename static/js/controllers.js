@@ -318,7 +318,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         }
       }
         
-        $scope.drive[ds][action] += temp['steps'] ? " -s " + (temp['steps'] || "") : "";
+        $scope.drive[ds][action] += temp['steps'  ] ? " -s " + (temp['steps'] || "") : "";
         delete temp['steps'];
         $scope.drive[ds][action] += temp['conditions'] ? " --conditions " + (temp['conditions'] || "") : "";
         delete temp['conditions'];
@@ -626,6 +626,58 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     });
 
   };
+  //===============Get the dataset's key value from the AlCa matrix================//
+  $scope.getAlCaDatasetValue = function (nameVal, type)
+  {
+    console.log("clicked " + nameVal);
+    var slashCounter = 0;
+    for (i = 1; i < nameVal.length; i++){     //looping through all the letters in the full dataset name to only get the DataSet(f.e. SingleElectron)
+        if (nameVal.charAt(i)==='/'){
+          var slashIndex = i;
+          break;
+        }
+    }
+    dsValue = nameVal.substring(1,slashIndex);
+    matrixVal = $scope.jsons.alca;
+    if(matrixVal[dsValue] == undefined){
+      $scope.alertMsg = {error : true, msg : "Check if the AlCa matrix is not empty and if there is the Dataset value!", show : true};
+    }
+    else{
+      console.log(matrixVal[dsValue]);
+      if($scope.data['req'][ds]['action'][type]['steps'] == undefined){ //just checkin if comma is needed and also avoiding 'undefined' string added to the steps
+        $scope.data['req'][ds]['action'][type]['steps'] = "ALCA:autoAlca[" + matrixVal[dsValue] + "]";
+      }
+      else{
+        $scope.data['req'][ds]['action'][type]['steps'] += ",ALCA:autoAlca[" + matrixVal[dsValue] + "]";
+      }
+    }
+  }
+  //===============Get the dataset's key value from the AlCa matrix================//
+  $scope.getSkimDatasetValue = function (nameVal, type)
+  {
+    console.log("clicked " + nameVal);
+    var slashCounter = 0;
+    for (i = 1; i < nameVal.length; i++){     //looping through all the letters in the full dataset name to only get the DataSet(f.e. SingleElectron)
+        if (nameVal.charAt(i)==='/'){
+          var slashIndex = i;
+          break;
+        }
+    }
+    dsValue = nameVal.substring(1,slashIndex);
+    matrixVal = $scope.jsons.skim;
+    if(matrixVal[dsValue] == undefined){
+      $scope.alertMsg = {error : true, msg : "Check if the Skim matrix is not empty and if there is the Dataset value!", show : true};
+    }
+    else{
+      console.log(matrixVal[dsValue]);
+      if($scope.data['req'][ds]['action'][type]['steps'] == undefined){ //just checkin if comma is needed and also avoiding 'undefined' string added to the steps
+        $scope.data['req'][ds]['action'][type]['steps'] = "SKIM:autoSkim[" + matrixVal[dsValue] + "]";
+      }
+      else{
+        $scope.data['req'][ds]['action'][type]['steps'] += ",SKIM:autoSkim[" + matrixVal[dsValue] + "]";
+      }
+    }
+  }
   //==================WATCH===================//
 
   $scope.$watch("data['req']", function(newValue, oldValue) {
