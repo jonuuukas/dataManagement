@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import json
 import pwd
@@ -15,8 +16,13 @@ from subprocess import Popen, PIPE
 app = Flask(__name__)
 ###original
 WORK_DIR = '/afs/cern.ch/user/j/jsiderav/public/dataManagement/stuff'
+WORKDIR = ''
 couch = CouchDBInterface()
 cred = '/afs/cern.ch/user/j/jsiderav/private/PdmVService.txt'
+dynamicLogger = {}
+dynamicLogger['stdout']=""
+dynamicLogger['stderr']=""
+dynamicLogger['flag']=""
 ###
 ###Replaced with below
 # WORK_DIR = '/home/dataManagement/stuff'
@@ -126,7 +132,23 @@ def save_doc():
     doc_data = couch.put_file(data)
     return json.dumps(doc_data)
 
-def get_bash(__release, _id, __scram):
+def get_test_bash(__release, _id, __scram):
+    WORKDIR = "Test_Folder"
+    comm = "#!/bin/bash\n"
+    comm += "mkdir %s\n" %WORKDIR
+    comm += "cd %s\n" %WORKDIR
+    comm += "export SCRAM_ARCH=%s\n" %(__scram)
+    comm += "source /afs/cern.ch/cms/cmsset_default.sh\n"
+    comm += "scram project %s\n" % (__release)
+    comm += "cd %s/src\n" % (__release)
+    comm += "cmsenv\n"
+    comm += "eval `scram runtime -sh`\n"
+    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
+    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
+    comm += "python step_make.py --in=%s\n" % (_id)
+    return comm
+
+def get_submit_bash(__release, _id, __scram):
     """
     Returns the stuff/tmp_execute.sh script that communicates with various CMSSW functions
     according to the current campaign submit data
@@ -166,10 +188,52 @@ def get_bash(__release, _id, __scram):
     #--------------------------------------------------
     return comm 
 
+@app.route('/test_campaign', methods=["POST"])
+def test_campaign():
+    data = json.loads(request.get_data())
+    __release = data['CMSSW']
+    _id = data['_id']
+    _rev = data['_rev']
+    doc = json.dumps(data['doc'])
+    __scram = get_scram(__release)
+    if __scram == '':
+        return "No scram"
+    #----------Creating & running bash file----------------------
+    __curr_dir = os.getcwd()
+    os.chdir(WORK_DIR)
+    __exec_file = open("tmp_test.sh", "w")
+    __exec_file.write(get_test_bash(__release, _id, __scram))
+    __exec_file.close()
+    log_file = file('logTest.txt','w')
+    err_file = file('log2Test.txt','w')
+    ###changing close_fds to True
+    proc = subprocess.Popen(['bash', 'tmp_test.sh'],
+                        stdout=log_file,stderr=err_file,close_fds=True)
+    log_file.close()
+    err_file.close()
+    #-----------------Uploading log file-------------------------
+    os.chdir("Test_Folder" + '/' + __release + '/' + "src/")
+    cfgFile = open("master.conf","r")
+    for line in cfgFile:
+        if line.startswith("cfg_path="):
+            arg = line[9:]
+            cmd = "cmsRun %s" %(arg)
+            proc = subprocess.Popen(('eval `scram runtime -sh` && cmsRun %s') %(arg),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
+            __ret_code = proc.wait()
+    dynamicLogger['stderr']= proc.stderr.read()
+    dynamicLogger['stdout']= proc.stdout.read()
+    if str(dynamicLogger['stderr']).find("Begin fatal exception"):
+        dynamicLogger['flag']="Fatality"
+        return json.dumps(dynamicLogger)   #pun intended, do not judge me
+    cfgFile.close()
+    rev = couch.get_file(_id)['_rev']
+    os.chdir(__curr_dir) ## back to working dir
+    return json.dumps(dynamicLogger)
+
 @app.route('/submit_campaign', methods=["POST"])
 def submit_campaign():
     """
-    Executes the submit button by updating the current campaign, creating/executing the script in get_bash()
+    Executes the submit button by updating the current campaign, creating/executing the script in get_submit_bash()
     Logs of the process can be found in the WORK_DIR variable location and a log is also uploaded to the CouchDB
     together with the object
     """
@@ -189,7 +253,7 @@ def submit_campaign():
     __curr_dir = os.getcwd()
     os.chdir(WORK_DIR)
     __exec_file = open("tmp_execute.sh", "w")
-    __exec_file.write(get_bash(__release, _id, __scram))
+    __exec_file.write(get_submit_bash(__release, _id, __scram))
     __exec_file.close()
     log_file = file('log.txt','w')
     err_file = file('log2.txt','w')

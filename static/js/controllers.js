@@ -43,7 +43,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
                     "skim" : {},
                     "lumi" : {}
                   };
-
+  $scope.testRes = {
+                    "stdout" : {},
+                    "stderr" : {}
+  }
   //=============Actions with datasets===========//
   $scope.addReq = function(name)
   {
@@ -451,7 +454,43 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       console.log("error:" + status);
     }); 
   };
-
+  //==========calls flask script which will only run through cmsRun in the cmsenv=====
+  //==========to check if the data input for all the datasets are correct=============
+  $scope.testDoc = function()
+  {
+    $scope.alertMsg['show'] = false;
+    $scope.working_on = true;
+    $http({
+      method: 'POST',
+      url:'test_campaign',
+      data:{
+            'doc' : $scope.doc,
+            '_id' : $scope.data['_id'],
+            '_rev': $scope.doc['_rev'],
+            'CMSSW' : $scope.data['CMSSW']
+            }
+    }).success(function(data,status){
+      if (data == 'No scram'){
+        $scope.alertMsg = {error : true, msg : "Test was unsuccessful. Scram version was not found for this CMSSW version", show : true};
+      }
+      else if (data['flag'] == "Fatality"){
+        $scope.alertMsg = {error : true, msg : "Fatal exception was found. See Test Output", show : true};
+        $scope.testRes.stderr = data['stderr'];
+        $scope.testRes.stdout = data['stdout'];
+      }
+      else{
+      $scope.alertMsg = {error:false, msg: "All tests ran fine in cmsRun. Proceed with submitting your campaign", show : true};
+      console.log("Test successful " + data['stderr'] + " " + status);
+      $scope.testRes.stderr = data['stderr'];
+      $scope.testRes.stdout = data['stdout'];
+    }
+    $scope.working_on = false;
+    }).error(function(status){
+      $scope.alertMsg = {error: true, msg : "Test failed, check the logs", show : true};
+      $scope.working_on = false;
+      console.log("Error: " + status);
+    });
+  };
   $scope.getAllDocs = function()
   {
     $http({

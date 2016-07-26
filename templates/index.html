@@ -7,6 +7,7 @@
       <script type=text/javascript src="static/js/angular.js"></script>
       <script type=text/javascript src="static/js/controllers.js"></script>
       <script type=text/javascript src="static/js/ui-bootstrap-tpls-0.12.1.js"></script>   
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
       <script src="https://use.fontawesome.com/cc110ae827.js"></script>
 
    </head>
@@ -18,21 +19,23 @@
                <h1>Data management application</h1>
             </div>
          </div>
-         <!-- laukai    -->
          <form class="form-inline" role="form" >
+            <!-- meniu laukai    -->
             <div class="row">
                <div class="col-lg-12">
 
                   <input type="text" ng-model="data['_id']" typeahead="elem for elem in list | filter:$viewValue | limitTo:10" class="form-control">
 
-                  <button type="submit" tooltip="Restore the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="inTheList" ng-click="loadData()">Load data <i class="fa fa-arrow-up" aria-hidden="true"></i></button>
+                  <button type="submit" tooltip="Restore the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="inTheList" ng-click="loadData()">Load data <i class="fa fa-cloud-upload" aria-hidden="true"></i></button>
                   <button type="submit" tooltip="Save the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="!doc['submitted'] && inTheList" ng-click="updateDoc()">Update doc <i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+                  <button type="submit" tooltip="Test current datasets by running them through cmsRun" tooltip-placement="bottom" class="btn btn-warning" ng-if="!doc['submitted'] && inTheList" ng-click="testDoc()">Test Doc <i class="fa fa-info-circle" aria-hidden="true"></i></button>
+                   <img ng-show="working_on" ng-src="https://twiki.cern.ch/twiki/pub/TWiki/TWikiDocGraphics/processing-bg.gif" src="https://twiki.cern.ch/twiki/pub/TWiki/TWikiDocGraphics/processing-bg.gif" class="ng-hide">
                   <button type="submit"  tooltip="Save the current campaign" tooltip-placement="bottom"  class="btn btn-primary" ng-if="!inTheList" ng-click="saveDoc()">Save doc <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
 
 
-                  <button type="submit" tooltip="WARNING: You can only submit the campaign once. Any changes will have to be saved to another campaign" tooltip-placement="bottom" class="btn btn-danger" ng-if="!doc['submitted'] && inTheList" ng-click="submitCampaign()">Submit campaign <i class="fa fa-archive" aria-hidden="true"></i></button> 
+                  <button type="submit" tooltip="WARNING: You can only submit the campaign once. Any changes will have to be saved to another campaign" tooltip-placement="bottom" class="btn btn-danger" ng-if="!doc['submitted'] && inTheList" ng-click="submitCampaign()">Submit campaign <i class="fa fa-sign-out" aria-hidden="true"></i></button> 
 
-                  <img ng-show="working_on" ng-src="https://twiki.cern.ch/twiki/pub/TWiki/TWikiDocGraphics/processing-bg.gif" src="https://twiki.cern.ch/twiki/pub/TWiki/TWikiDocGraphics/processing-bg.gif" class="ng-hide">
+                 
                   
                   <span class="{{((alertMsg['error']) ? 'alert alert-danger' : 'alert alert-success')}}" role="alert" ng-if="alertMsg['show']">
                      <span class="{{((alertMsg['error']) ? 'glyphicon glyphicon-warning-sign' : 'glyphicon glyphicon-ok-sign')}}" aria-hidden="true"></span>
@@ -43,8 +46,40 @@
                
             </div>
 
-            
+            <!---SHIT IS REAL FROM HERE -->
+            <div class="row">
+               <div class="col-lg-12 h4">
+               </div>
+            </div>
+            <accordion close-others="false">
+            <accordion-group is-open="status.open">
+               <accordion-heading>
+                  Test Output
+                  <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                  </accordion-heading>
+                  <div class="row">
+                     <div class ="col-lg-12">
+                     <ul class="nav nav-tabs">
+                      <li ng-click="item=1"><a data-toggle="tab">StdErr</a>  </li>
+                      <li ng-click="item=2"> <a data-toggle="tab"> StdOut</a></li>
+                     </ul>
 
+              <div class="tab-content" ng-init='item=1'>
+                   <div ng-show='item == 1'>
+                     <h3>StdErr</h3>
+                     <pre id="testOutput" style="margin-top: 5px">{{testRes['stderr']}}</pre>
+                  </div>
+                  <div ng-show='item == 2'>
+                     <h3>StdOut</h3>
+                     <pre id="testOutput" style="margin-top: 5px">{{testRes['stdout']}}</pre>
+                  </div>
+               </div>
+
+                     </div>
+                  </div>
+            </accordion-group>
+            </accordion>
+            <!---TO HERE -->
             <div class="row">
                <div class="col-lg-12 h4">
                </div>
