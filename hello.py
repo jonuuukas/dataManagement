@@ -19,10 +19,7 @@ WORK_DIR = '/afs/cern.ch/user/j/jsiderav/public/dataManagement/stuff'
 WORKDIR = ''
 couch = CouchDBInterface()
 cred = '/afs/cern.ch/user/j/jsiderav/private/PdmVService.txt'
-dynamicLogger = {}
-dynamicLogger['stdout']=""
-dynamicLogger['stderr']=""
-dynamicLogger['flag']=""
+
 ###
 ###Replaced with below
 # WORK_DIR = '/home/dataManagement/stuff'
@@ -143,9 +140,9 @@ def get_test_bash(__release, _id, __scram):
     comm += "cd %s/src\n" % (__release)
     comm += "cmsenv\n"
     comm += "eval `scram runtime -sh`\n"
-    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
-    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
-    comm += "python step_make.py --in=%s\n" % (_id)
+    # comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
+    # comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
+    comm += "python ../../../../step_make.py --in=%s\n" % (_id)
     return comm
 
 def get_submit_bash(__release, _id, __scram):
@@ -158,7 +155,7 @@ def get_submit_bash(__release, _id, __scram):
     comm = "#!/bin/bash\n"
     comm += "mkdir %s\n" %WORKDIR
     comm += "cd %s\n" %WORKDIR
-    comm += "export SCRAM_ARCH=%s\n" %(__scram)
+    comm += "export SCRAM_ARCH=%s\n" %(__scramam)
     comm += "source /afs/cern.ch/cms/cmsset_default.sh\n"
     comm += "scram project %s\n" % (__release)
     comm += "cd %s/src\n" % (__release)
@@ -194,6 +191,7 @@ def test_campaign():
     __release = data['CMSSW']
     _id = data['_id']
     _rev = data['_rev']
+    req = data['req']
     doc = json.dumps(data['doc'])
     __scram = get_scram(__release)
     if __scram == '':
@@ -214,17 +212,24 @@ def test_campaign():
     #-----------------Uploading log file-------------------------
     os.chdir("Test_Folder" + '/' + __release + '/' + "src/")
     cfgFile = open("master.conf","r")
+    i = 0
+    dynamicLogger={}
     for line in cfgFile:
         if line.startswith("cfg_path="):
             arg = line[9:]
+            dynamicLogger[req.keys()[i]] = {}
             cmd = "cmsRun %s" %(arg)
             proc = subprocess.Popen(('eval `scram runtime -sh` && cmsRun %s') %(arg),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
+            # proc = subprocess.Popen(('eval `scram runtime -sh` && cmsRun %s'),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
             __ret_code = proc.wait()
-    dynamicLogger['stderr']= proc.stderr.read()
-    dynamicLogger['stdout']= proc.stdout.read()
-    if str(dynamicLogger['stderr']).find("Begin fatal exception"):
-        dynamicLogger['flag']="Fatality"
-        return json.dumps(dynamicLogger)   #pun intended, do not judge me
+            dynamicLogger[req.keys()[i]]['stderr']= proc.stderr.read()
+            dynamicLogger[req.keys()[i]]['stdout']= proc.stdout.read()
+            
+            if str(dynamicLogger[req.keys()[i]]['stderr']).find("Begin fatal exception"):
+                dynamicLogger['flag']="Fatality"    #pun intended, do not judge me
+                #return json.dumps(dynamicLogger)   
+            i+=1
+
     cfgFile.close()
     rev = couch.get_file(_id)['_rev']
     os.chdir(__curr_dir) ## back to working dir

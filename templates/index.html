@@ -51,32 +51,43 @@
                <div class="col-lg-12 h4">
                </div>
             </div>
-            <accordion close-others="false">
+            <accordion close-others="false" ng-show="is_tested">
             <accordion-group is-open="status.open">
                <accordion-heading>
                   Test Output
                   <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                   </accordion-heading>
-                  <div class="row">
-                     <div class ="col-lg-12">
-                     <ul class="nav nav-tabs">
-                      <li ng-click="item=1"><a data-toggle="tab">StdErr</a>  </li>
-                      <li ng-click="item=2"> <a data-toggle="tab"> StdOut</a></li>
-                     </ul>
+                     <div class="row" ng-repeat="(name, info) in data['req']">
+                     <div class='col-lg-12'>
+                     <accordion close-others="oneAtATime">
+                        <accordion-group is-open="secondStatus.open">
+                           
+                                       <accordion-heading>
+                                       {{name}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': secondStatus.open, 'glyphicon-chevron-right': !secondStatus.open}"></i>
+                                       </accordion-heading>
+                                          <div class ="col-lg-12">
+                                          <ul class="nav nav-tabs">
+                                           <li ng-click="item=1"><a data-toggle="tab">StdErr</a>  </li>
+                                           <li ng-click="item=2"> <a data-toggle="tab"> StdOut</a></li>
+                                          </ul>
+                                 
+                                               <div class="tab-content" ng-init='item=1'>
+                                                    <div ng-show='item == 1'>
+                                                      <h3>StdErr</h3>
+                                                      <pre id="testOutput" style="margin-top: 5px">{{info['stderr']}}</pre>
+                                                   </div>
+                                                   <div ng-show='item == 2'>
+                                                      <h3>StdOut</h3>
+                                                      <pre id="testOutput" style="margin-top: 5px">{{info['stdout']}}</pre>
+                                                   </div>
+                                                </div>
 
-              <div class="tab-content" ng-init='item=1'>
-                   <div ng-show='item == 1'>
-                     <h3>StdErr</h3>
-                     <pre id="testOutput" style="margin-top: 5px">{{testRes['stderr']}}</pre>
-                  </div>
-                  <div ng-show='item == 2'>
-                     <h3>StdOut</h3>
-                     <pre id="testOutput" style="margin-top: 5px">{{testRes['stdout']}}</pre>
-                  </div>
-               </div>
-
+                                          </div>
+                        </accordion-group>
+                     </accordion>
                      </div>
-                  </div>
+                     </div>
+
             </accordion-group>
             </accordion>
             <!---TO HERE -->

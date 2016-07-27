@@ -18,6 +18,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
   $scope.working_on = false;
   $scope.alertMsg = {error : false, msg : "", show : false};
+  $scope.is_tested = false;
 
   $scope.doc = {};
   $scope.check = {};
@@ -460,6 +461,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   {
     $scope.alertMsg['show'] = false;
     $scope.working_on = true;
+    $scope.is_tested = true;
     $http({
       method: 'POST',
       url:'test_campaign',
@@ -467,7 +469,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
             'doc' : $scope.doc,
             '_id' : $scope.data['_id'],
             '_rev': $scope.doc['_rev'],
-            'CMSSW' : $scope.data['CMSSW']
+            'CMSSW' : $scope.data['CMSSW'],
+            'req' : $scope.data['req']
             }
     }).success(function(data,status){
       if (data == 'No scram'){
@@ -475,16 +478,15 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       }
       else if (data['flag'] == "Fatality"){
         $scope.alertMsg = {error : true, msg : "Fatal exception was found. See Test Output", show : true};
-        $scope.testRes.stderr = data['stderr'];
-        $scope.testRes.stdout = data['stdout'];
       }
       else{
       $scope.alertMsg = {error:false, msg: "All tests ran fine in cmsRun. Proceed with submitting your campaign", show : true};
-      console.log("Test successful " + data['stderr'] + " " + status);
-      $scope.testRes.stderr = data['stderr'];
-      $scope.testRes.stdout = data['stdout'];
     }
     $scope.working_on = false;
+    angular.forEach($scope.data['req'], function (value, key){
+      $scope.data['req'][key]['stderr'] = data[key]['stderr'];
+      $scope.data['req'][key]['stdout'] = data[key]['stdout'];
+    });
     }).error(function(status){
       $scope.alertMsg = {error: true, msg : "Test failed, check the logs", show : true};
       $scope.working_on = false;
