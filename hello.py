@@ -130,6 +130,10 @@ def save_doc():
     return json.dumps(doc_data)
 
 def get_test_bash(__release, _id, __scram):
+    """
+    Small bash script generator which will initialize cms environment,
+    and generate config files for the cmsRun command
+    """
     WORKDIR = "Test_Folder"
     comm = "#!/bin/bash\n"
     comm += "mkdir %s\n" %WORKDIR
@@ -140,8 +144,6 @@ def get_test_bash(__release, _id, __scram):
     comm += "cd %s/src\n" % (__release)
     comm += "cmsenv\n"
     comm += "eval `scram runtime -sh`\n"
-    # comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
-    # comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
     comm += "python ../../../../step_make.py --in=%s\n" % (_id)
     return comm
 
@@ -187,6 +189,12 @@ def get_submit_bash(__release, _id, __scram):
 
 @app.route('/test_campaign', methods=["POST"])
 def test_campaign():
+    """
+    Creates a bash script that will proceed with the config file generation and
+    will run the cmsRun command without injecting it to request manager
+    runs tests with all the datasets of the campaign and return jsons
+    should be processed by the dataset name in controllers.js
+    """
     data = json.loads(request.get_data())
     __release = data['CMSSW']
     _id = data['_id']
@@ -204,34 +212,29 @@ def test_campaign():
     __exec_file.close()
     log_file = file('logTest.txt','w')
     err_file = file('log2Test.txt','w')
-    ###changing close_fds to True
     proc = subprocess.Popen(['bash', 'tmp_test.sh'],
                         stdout=log_file,stderr=err_file,close_fds=True)
     log_file.close()
     err_file.close()
-    #-----------------Uploading log file-------------------------
+    #-----------------Running the cmsRun command-------------------------
     os.chdir("Test_Folder" + '/' + __release + '/' + "src/")
     cfgFile = open("master.conf","r")
-    i = 0
+    i = 0   #loop needed to cycle through all the datasets and differ gathered information based on the dataset name
     dynamicLogger={}
     for line in cfgFile:
         if line.startswith("cfg_path="):
             arg = line[9:]
             dynamicLogger[req.keys()[i]] = {}
-            cmd = "cmsRun %s" %(arg)
             proc = subprocess.Popen(('eval `scram runtime -sh` && cmsRun %s') %(arg),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
-            # proc = subprocess.Popen(('eval `scram runtime -sh` && cmsRun %s'),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
             __ret_code = proc.wait()
-            dynamicLogger[req.keys()[i]]['stderr']= proc.stderr.read()
+            dynamicLogger[req.keys()[i]]['stderr']= proc.stderr.read()  #all the logging is given to the browser, if needed in a text file - just write the dynamicLogger dict to a file
             dynamicLogger[req.keys()[i]]['stdout']= proc.stdout.read()
             
             if str(dynamicLogger[req.keys()[i]]['stderr']).find("Begin fatal exception"):
                 dynamicLogger['flag']="Fatality"    #pun intended, do not judge me
-                #return json.dumps(dynamicLogger)   
             i+=1
 
     cfgFile.close()
-    rev = couch.get_file(_id)['_rev']
     os.chdir(__curr_dir) ## back to working dir
     return json.dumps(dynamicLogger)
 
