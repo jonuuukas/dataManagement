@@ -438,6 +438,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.updateDoc = function()
   {
     $scope.alertMsg['show'] = false;
+    $scope.is_tested = false;
     $http({
       method: 'POST', 
       url:'update_file', 
@@ -456,7 +457,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     }); 
   };
   //==========calls flask script which will only run through cmsRun in the cmsenv=====
-  //==========to check if the data input for all the datasets are correct=============
+  //==========to check if the data input for all the datasets is correct=============
   $scope.testDoc = function()
   {
     $scope.alertMsg['show'] = false;
@@ -483,7 +484,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.alertMsg = {error:false, msg: "All tests ran fine in cmsRun. Proceed with submitting your campaign", show : true};
     }
     $scope.working_on = false;
-    angular.forEach($scope.data['req'], function (value, key){
+    angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
       $scope.data['req'][key]['stderr'] = data[key]['stderr'];
       $scope.data['req'][key]['stdout'] = data[key]['stdout'];
     });
@@ -547,6 +548,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.loadData = function()
   {
     console.log("id: " + $scope.data['_id']);
+    $scope.is_tested = false;
+    $scope.working_on = false;
     $http({
             method: 'POST', 
             url:'load_data', 
