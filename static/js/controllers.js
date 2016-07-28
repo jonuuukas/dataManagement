@@ -450,10 +450,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     }).success(function(data, status){
       $scope.loadData();
       $scope.alertMsg = {error : false, msg : "Action was successful.", show : true};     
-      console.log("success" + data + " " + status);
+      console.log("Success updating the doc: " + data + " " + status);
     }).error(function(status){
       $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
-      console.log("error:" + status);
+      console.log("Error while updating the doc: " + status);
     }); 
   };
   //==========calls flask script which will only run through cmsRun in the cmsenv=====
@@ -481,17 +481,18 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.alertMsg = {error : true, msg : "Fatal exception was found. See Test Output", show : true};
       }
       else{
-      $scope.alertMsg = {error:false, msg: "All tests ran fine in cmsRun. Proceed with submitting your campaign", show : true};
+      $scope.alertMsg = {error:false, msg: "No fatal errors. See Test Output to be sure", show : true};
     }
     $scope.working_on = false;
     angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
       $scope.data['req'][key]['stderr'] = data[key]['stderr'];
       $scope.data['req'][key]['stdout'] = data[key]['stdout'];
+      console.log("Test run succeeded, check Test Output for results")
     });
     }).error(function(status){
       $scope.alertMsg = {error: true, msg : "Test failed, check the logs", show : true};
       $scope.working_on = false;
-      console.log("Error: " + status);
+      console.log("Error while running the test: " + status);
     });
   };
   $scope.getAllDocs = function()
@@ -505,9 +506,9 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         var iteratee = tmp[i];
         $scope.list.push(iteratee['id']); 
       }
-      console.log("success");
+      console.log("Success. Got all docs");
     }).error(function(status){
-      console.log("error:" + status);
+      console.log("Error while getting docs:" + status);
     }); 
   };
 
@@ -537,11 +538,11 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.loadData();
       $scope.getAllDocs();
       $scope.inTheList = true;
-      console.log("success" + data + " " + status);
+      console.log("Success while saving the doc" + data + " " + status);
     }).error(function(status){
       $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
       $scope.working_on = false;      
-      console.log("error:" + status);
+      console.log("Error while saving the doc:" + status);
     });  
   };
 
@@ -580,10 +581,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         }
       }
 
-      $scope.alertMsg = {error : false, msg : "Action was successful.", show : true};
+      $scope.alertMsg = {error : false, msg : "Loading was successful.", show : true};
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
-      console.log("error:" + status);
+      $scope.alertMsg = {error : true, msg : "Loading was unsuccessful.", show : true};
+      console.log("Error while loading:" + status);
     }); 
   };
 
@@ -611,12 +612,12 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.doc['submitted'] = false;
       } else {
         $scope.alertMsg = {error : true, msg : "Submit was unsuccessful. Something went wrong, better check the logs!", show : true};
-        console.log("Something went wrong" + data +" status: " + status);
+        console.log("Submit went wrong:" + data +" status: " + status);
       }
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Action was unsuccessful", show : true};
+      $scope.alertMsg = {error : true, msg : "Submitting was unsuccessful", show : true};
       $scope.working_on = false;
-      console.log("error: " + status);
+      console.log("Submit error: " + status);
     });
   };
   //======================Copy to clipboard button for the Full JSON fields===================================
@@ -646,10 +647,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         'CMSSW' : $scope.data['CMSSW']
     }
   }).success(function(data,status){
-      console.log("success on click " + angular.toJson(data));
+      console.log("Success while getting Skim matrix value" + angular.toJson(data));
       $scope.jsons.skim = data;
     }).error(function(status){
-      console.log("unsuccessful on click " + status);
+      console.log("Error on getting Skim matrix value " + status);
     });
 
   };
@@ -663,10 +664,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         'CMSSW' : $scope.data['CMSSW']
     }
   }).success(function(data,status){
-      console.log("success on click " + angular.toJson(data));
+      console.log("Success on getting AlCa matrix value " + angular.toJson(data));
       $scope.jsons.alca = data;
     }).error(function(status){
-      console.log("unsuccessful on click " + status);
+      console.log("Error on getting AlCa matrix value " + status);
     });
 
   };
