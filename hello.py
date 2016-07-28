@@ -142,9 +142,10 @@ def get_test_bash(__release, _id, __scram):
     comm += "source /afs/cern.ch/cms/cmsset_default.sh\n"
     comm += "scram project %s\n" % (__release)
     comm += "cd %s/src\n" % (__release)
-    comm += "cmsenv\n"
-    comm += "eval `scram runtime -sh`\n"
-    comm += "python ../../../../step_make.py --in=%s\n" % (_id)
+    comm += "rm step_make.py\n"
+    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
+    # comm += "eval `scram runtime -sh`\n"
+    comm += "eval `scram runtime -sh` && python step_make.py --in=%s\n" % (_id)
     return comm
 
 def get_submit_bash(__release, _id, __scram):
@@ -157,7 +158,7 @@ def get_submit_bash(__release, _id, __scram):
     comm = "#!/bin/bash\n"
     comm += "mkdir %s\n" %WORKDIR
     comm += "cd %s\n" %WORKDIR
-    comm += "export SCRAM_ARCH=%s\n" %(__scramam)
+    comm += "export SCRAM_ARCH=%s\n" %(__scram)
     comm += "source /afs/cern.ch/cms/cmsset_default.sh\n"
     comm += "scram project %s\n" % (__release)
     comm += "cd %s/src\n" % (__release)
@@ -171,7 +172,6 @@ def get_submit_bash(__release, _id, __scram):
     #####################LOCAL REPO IS CURRENTLY BEING USED FOR THE WGET LINES#################
     comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
     comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
-    comm += "wget https://raw.githubusercontent.com/cms-sw/cmssw/CMSSW_5_3_7/Configuration/DataProcessing/python/Reco.py\n"
     ######################################SEE ABOVE, NOOB######################################
     comm += "python step_make.py --in=%s\n" % (_id)
     #-------------For wmcontrol.py---------------------
@@ -205,6 +205,7 @@ def test_campaign():
     if __scram == '':
         return "No scram"
     #----------Creating & running bash file----------------------
+    couch.update_file(_id, doc, _rev) #lets try this
     __curr_dir = os.getcwd()
     os.chdir(WORK_DIR)
     __exec_file = open("tmp_test.sh", "w")
