@@ -134,6 +134,7 @@ def get_test_bash(__release, _id, __scram):
     Small bash script generator which will initialize cms environment,
     and generate config files for the cmsRun command
     """
+    #------------To get the config files of the datasets---------------------
     WORKDIR = "Test_Folder"
     comm = "#!/bin/bash\n"
     comm += "mkdir %s\n" %WORKDIR
@@ -191,8 +192,8 @@ def get_submit_bash(__release, _id, __scram):
 def test_campaign():
     """
     Creates a bash script that will proceed with the config file generation and
-    will run the cmsRun command without injecting it to request manager
-    runs tests with all the datasets of the campaign and return jsons
+    will run the cmsRun command without injecting it to request manager.
+    Runs tests with all the datasets of the campaign and return jsons
     should be processed by the dataset name in controllers.js
     """
     data = json.loads(request.get_data())
@@ -232,7 +233,7 @@ def test_campaign():
             dynamicLogger[req.keys()[i]]['stdout']= proc.stdout.read()
             
             if str(dynamicLogger[req.keys()[i]]['stderr']).find("Begin fatal exception"):
-                dynamicLogger['flag']="Fatality"    #pun intended, do not judge me
+                dynamicLogger['flag']="Fatality"    #subzero ftw
             i+=1
 
     cfgFile.close()
@@ -256,7 +257,6 @@ def submit_campaign():
     __scram = get_scram(__release)
     if __scram == '':
         return "No scram"
-    #update document
     couch.update_file(_id, doc, _rev)
     #----------Creating & running bash file----------------------
     __curr_dir = os.getcwd()
@@ -266,7 +266,6 @@ def submit_campaign():
     __exec_file.close()
     log_file = file('log.txt','w')
     err_file = file('log2.txt','w')
-    ###changing close_fds to True
     proc = subprocess.Popen(['bash', 'tmp_execute.sh'],
                         stdout=log_file,stderr=err_file,close_fds=True)
     __ret_code = proc.wait()
