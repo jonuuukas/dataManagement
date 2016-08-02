@@ -456,6 +456,16 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       console.log("Error while updating the doc: " + status);
     }); 
   };
+//=============Runs through the datasets and clear the test input data just in case=========//
+  $scope.cleanTests = function()
+    {
+          angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
+          $scope.data['req'][key]['stderr'] = {};
+          $scope.data['req'][key]['stdout'] = {};
+          console.log("clean");
+        });
+
+    };
   //==========calls flask script which will only run through cmsRun in the cmsenv=====
   //==========to check if the data input for all the datasets is correct=============
   $scope.testDoc = function()
@@ -463,6 +473,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     $scope.alertMsg['show'] = false;
     $scope.working_on = true;
     $scope.is_tested = true;
+    $scope.cleanTests();
     $http({
       method: 'POST',
       url:'test_campaign',
