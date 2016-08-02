@@ -147,6 +147,7 @@ def get_test_bash(__release, _id, __scram):
     comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
     # comm += "eval `scram runtime -sh`\n"
     comm += "eval `scram runtime -sh` && python step_make.py --in=%s\n" % (_id)
+    comm += "cat %s | voms-proxy-init -voms cms -pwstdin\n" %(cred)
     return comm
 
 def get_submit_bash(__release, _id, __scram):
@@ -218,6 +219,8 @@ def test_campaign():
                         stdout=log_file,stderr=err_file,close_fds=True)
     log_file.close()
     err_file.close()
+    _ret_code = proc.wait()
+    #raise Exception(str(_ret_code))
     #-----------------Running the cmsRun command-------------------------
     os.chdir("Test_Folder" + '/' + __release + '/' + "src/")
     cfgFile = open("master.conf","r")
@@ -227,10 +230,16 @@ def test_campaign():
         if line.startswith("cfg_path="):
             arg = line[9:]
             dynamicLogger[req.keys()[i]] = {}
-            proc = subprocess.Popen(('eval `scram runtime -sh` && cmsRun %s') %(arg),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
+            proc = subprocess.Popen(('eval `scram runtime -sh` && cmsRun %s') %(arg),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True, close_fds=True)
             __ret_code = proc.wait()
             dynamicLogger[req.keys()[i]]['stderr']= proc.stderr.read()  #all the logging is given to the browser, if needed in a text file - just write the dynamicLogger dict to a file
             dynamicLogger[req.keys()[i]]['stdout']= proc.stdout.read()
+            log_file = file(str(i)+ "log.txt", "w")
+            err_file = file(str(i)+ "errLog.txt", "w")
+            log_file.write(dynamicLogger[req.keys()[i]]['stdout'])
+            err_file.write(dynamicLogger[req.keys()[i]]['stderr'])
+            log_file.close()
+            err_file.close()
             
             if str(dynamicLogger[req.keys()[i]]['stderr']).find("Begin fatal exception"):
                 dynamicLogger['flag']="Fatality"    #subzero ftw
