@@ -84,6 +84,9 @@ def update_file():
     data = json.loads(request.get_data())
     _id = data['_id']
     _rev = data['_rev']
+    data['doc']['alca'] = data['alca']
+    data['doc']['skim'] = data['skim']
+    data['doc']['lumi'] = data['lumi']
     doc = json.dumps(data['doc'])
     doc_data = couch.update_file(_id, doc, _rev)
     return json.dumps(doc_data)

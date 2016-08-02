@@ -445,7 +445,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       data: {
               'doc' : $scope.doc, 
               '_id': $scope.data['_id'],
-              '_rev' : $scope.doc['_rev']
+              '_rev' : $scope.doc['_rev'],
+              'alca' : $scope.jsons.alca,
+              'lumi' : $scope.jsons.lumi,
+              'skim' : $scope.jsons.skim
             }
     }).success(function(data, status){
       $scope.loadData();
