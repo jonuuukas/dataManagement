@@ -213,6 +213,7 @@ def test_campaign():
     couch.update_file(_id, doc, _rev) #lets try this
     __curr_dir = os.getcwd()
     os.chdir(WORK_DIR)
+    print("changed dir to /stuff")
     __exec_file = open("tmp_test.sh", "w")
     __exec_file.write(get_test_bash(__release, _id, __scram))
     __exec_file.close()
@@ -222,21 +223,27 @@ def test_campaign():
                         stdout=log_file,stderr=err_file,close_fds=True)
     log_file.close()
     err_file.close()
-    _ret_code = proc.wait()
+    #_ret_code = proc.wait()
+    print("finished running tmp_test")
     #raise Exception(str(_ret_code))
     #-----------------Running the cmsRun command-------------------------
     os.chdir("Test_Folder" + '/' + __release + '/' + "src/")
     cfgFile = open("master.conf","r")
     i = 0   #loop needed to cycle through all the datasets and differ gathered information based on the dataset name
     dynamicLogger={}
+    print ("starting the loop thrtough master.conf")
     for line in cfgFile:
         if line.startswith("cfg_path="):
+            print ("bingo! cfg_path found")
             arg = line[9:]
             dynamicLogger[req.keys()[i]] = {}
+            print("executing eval subprocess and cmsRun")
             proc = subprocess.Popen(('eval `scram runtime -sh` && cmsRun %s') %(arg),stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True, close_fds=True)
             __ret_code = proc.wait()
+            print("finished running the cmsRun with the _retcode: " + str(__ret_code))
             dynamicLogger[req.keys()[i]]['stderr']= proc.stderr.read()  #all the logging is given to the browser, if needed in a text file - just write the dynamicLogger dict to a file
             dynamicLogger[req.keys()[i]]['stdout']= proc.stdout.read()
+            print("starting logging process")
             log_file = file(str(i)+ "log.txt", "w")
             err_file = file(str(i)+ "errLog.txt", "w")
             log_file.write(dynamicLogger[req.keys()[i]]['stdout'])
@@ -249,6 +256,7 @@ def test_campaign():
             i+=1
 
     cfgFile.close()
+    print("finished looping. returning to the AngularJS")
     os.chdir(__curr_dir) ## back to working dir
     return json.dumps(dynamicLogger)
 

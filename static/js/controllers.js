@@ -463,8 +463,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.cleanTests = function()
     {
           angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
-          $scope.data['req'][key]['stderr'] = {};
-          $scope.data['req'][key]['stdout'] = {};
+          $scope.data['req'][key]['stderr'] = "Tests are being run. Please wait";
+          $scope.data['req'][key]['stdout'] = "Tests are being run. Please wait";
           console.log("clean");
         });
 
