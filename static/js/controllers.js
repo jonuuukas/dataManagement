@@ -704,10 +704,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     else{
       console.log(matrixVal[dsValue]);
       if($scope.data['req'][nameVal]['action'][type]['steps'] == undefined){ //just checkin if comma is needed and also avoiding 'undefined' string added to the steps
-        $scope.data['req'][nameVal]['action'][type]['steps'] = "ALCA:autoAlca[" + matrixVal[dsValue] + "]";
+        $scope.data['req'][nameVal]['action'][type]['steps'] = "ALCA:" + matrixVal[dsValue];
       }
       else{
-        $scope.data['req'][nameVal]['action'][type]['steps'] += ",ALCA:autoAlca[" + matrixVal[dsValue] + "]";
+        $scope.data['req'][nameVal]['action'][type]['steps'] += ",ALCA:" + matrixVal[dsValue];
       }
     }
   }
@@ -730,10 +730,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     else{
       console.log(matrixVal[dsValue]);
       if($scope.data['req'][nameVal]['action'][type]['steps'] == undefined){ //just checkin if comma is needed and also avoiding 'undefined' string added to the steps
-        $scope.data['req'][nameVal]['action'][type]['steps'] = "SKIM:autoSkim[" + matrixVal[dsValue] + "]";
+        $scope.data['req'][nameVal]['action'][type]['steps'] = "SKIM:" + matrixVal[dsValue];
       }
       else{
-        $scope.data['req'][nameVal]['action'][type]['steps'] += ",SKIM:autoSkim[" + matrixVal[dsValue] + "]";
+        $scope.data['req'][nameVal]['action'][type]['steps'] += ",SKIM:" + matrixVal[dsValue];
       }
     }
   }
