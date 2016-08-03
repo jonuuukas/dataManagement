@@ -438,7 +438,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.updateDoc = function()
   {
     $scope.alertMsg['show'] = false;
-    $scope.is_tested = false;
+   // $scope.is_tested = false;
     $http({
       method: 'POST', 
       url:'update_file', 
@@ -460,12 +460,19 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     }); 
   };
 //=============Runs through the datasets and clear the test input data just in case=========//
-  $scope.cleanTests = function()
+  $scope.checkTests = function()
     {
+          console.log("checking the tests");
           angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
-          $scope.data['req'][key]['stderr'] = "Tests are being run. Please wait";
-          $scope.data['req'][key]['stdout'] = "Tests are being run. Please wait";
-          console.log("clean");
+          console.log($scope.data['req'][key]['stderr'] + " aaaand " + $scope.data['req'][key]['stdout']);
+          if( $scope.data['req'][key]['stderr'] != undefined && $scope.data['req'][key]['stdout'] != undefined){
+                $scope.is_tested = true;            
+            }
+          else {
+            $scope.is_tested = false;
+            }
+          //$scope.data['req'][key]['stdout'] = "Tests are being run. Please wait";
+
         });
 
     };
@@ -476,7 +483,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     $scope.alertMsg['show'] = false;
     $scope.working_on = true;
     $scope.is_tested = true;
-    $scope.cleanTests();
+    //$scope.cleanTests();
     $http({
       method: 'POST',
       url:'test_campaign',
@@ -563,7 +570,6 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.loadData = function()
   {
     console.log("id: " + $scope.data['_id']);
-    $scope.is_tested = false;
     $scope.working_on = false;
     $http({
             method: 'POST', 
@@ -594,7 +600,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
           $scope.formDriver(ds,action);
         }
       }
-
+      $scope.checkTests();
       $scope.alertMsg = {error : false, msg : "Loading was successful.", show : true};
     }).error(function(status){
       $scope.alertMsg = {error : true, msg : "Loading was unsuccessful.", show : true};
