@@ -147,6 +147,7 @@ def get_test_bash(__release, _id, __scram):
     comm += "scram project %s\n" % (__release)
     comm += "cd %s/src\n" % (__release)
     comm += "rm step_make.py\n"
+    comm += "rm couchdb_interface.py\n"
     comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
     comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
     # comm += "eval `scram runtime -sh`\n"
