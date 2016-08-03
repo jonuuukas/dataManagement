@@ -148,6 +148,7 @@ def get_test_bash(__release, _id, __scram):
     comm += "cd %s/src\n" % (__release)
     comm += "rm step_make.py\n"
     comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
+    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
     # comm += "eval `scram runtime -sh`\n"
     comm += "eval `scram runtime -sh` && python step_make.py --in=%s\n" % (_id)
     comm += "cat %s | voms-proxy-init -voms cms -pwstdin\n" %(cred)
