@@ -27,16 +27,19 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.defCon = {};
   $scope.recoOpt = {
                     "steps" : "steps",
-                    "conditions": "conditions" 
+                    "conditions": "conditions",
+                    "n":"n" 
                     };
   $scope.skimOpt = {
                   "steps" : "steps",
                   "conditions": "conditions", 
-                  "skimoption": "skimoption"
+                  "skimoption": "skimoption",
+                  "n":"n" 
                   };
   $scope.miniOpt = {
                   "steps": "steps", 
-                  "conditions": "conditions"
+                  "conditions": "conditions",
+                  "n":"n" 
                   };
   $scope.defOpt = {"reco" : $scope.recoOpt, "skim" : $scope.skimOpt, "mini" : $scope.miniOpt};
   $scope.jsons = {
@@ -324,6 +327,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         
         $scope.drive[ds][action] += temp['steps'  ] ? " -s " + (temp['steps'] || "") : "";
         delete temp['steps'];
+        $scope.drive[ds][action] += temp['n'  ] ? " -n " + (temp['n'] || "") : "";
+        delete temp['n'];
         $scope.drive[ds][action] += temp['conditions'] ? " --conditions " + (temp['conditions'] || "") : "";
         delete temp['conditions'];
         $scope.drive[ds][action] += temp['eventcontent'] ? " --eventcontent " + (temp['eventcontent'] || "") : "";
@@ -371,7 +376,9 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.drive[ds][action] = "";
         $scope.drive[ds][action] = "cmsDriver.py skim";
         $scope.drive[ds][action] += temp['steps'] ? " -s " + (temp['steps'] || "") : "";
-        delete temp['steps'];     
+        delete temp['steps'];  
+        $scope.drive[ds][action] += temp['n'  ] ? " -n " + (temp['n'] || "") : "";
+        delete temp['n'];
         $scope.drive[ds][action] += temp['conditions'] ? " --conditions " + (temp['conditions'] || " ") : "";
         delete temp['conditions'];
         $scope.drive[ds][action] += temp['skimoption'] ? " --skimoption " + (temp['skimoption'] || " ") : "";
