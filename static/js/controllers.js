@@ -466,17 +466,19 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       console.log("Error while updating the doc: " + status);
     }); 
   };
-//=============Runs through the datasets and clear the test input data just in case=========//
+//=============Runs through the datasets and checks if there is data in the stderr n stdout to show the output=========//
   $scope.checkTests = function()
     {
           console.log("checking the tests");
           angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
-          console.log($scope.data['req'][key]['stderr'] + " aaaand " + $scope.data['req'][key]['stdout']);
+          $scope.data['req'][key]["flag"] = "";
           if( $scope.data['req'][key]['stderr'] != undefined && $scope.data['req'][key]['stdout'] != undefined){
                 $scope.is_tested = true;            
             }
           else {
             $scope.is_tested = false;
+            $scope.data['req'][key]["stderr"] = "";
+            $scope.data['req'][key]["stdout"] = "";
             }
           //$scope.data['req'][key]['stdout'] = "Tests are being run. Please wait";
 
@@ -522,6 +524,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.working_on = false;
       console.log("Error while running the test: " + status);
     });
+    //$scope.updateDoc();
   };
   $scope.getAllDocs = function()
   {
@@ -750,6 +753,16 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       }
     }
   }
+//========Checks if --runUnscheduled is inside string and adds/removes accordingly ==========//
+  $scope.addRunUnscheduled = function (nameVal, type)
+    {
+        if($scope.drive[nameVal][type].search("--run") === -1){
+                    $scope.drive[nameVal][type] += " --runUnscheduled";
+        }
+        else if($scope.drive[nameVal][type].search("--run") !== -1){
+                $scope.drive[nameVal][type] = $scope.drive[nameVal][type].replace(" --runUnscheduled", "");
+        }
+    }
   //==================WATCH===================//
 
   $scope.$watch("data['req']", function(newValue, oldValue) {
