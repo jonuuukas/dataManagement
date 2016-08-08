@@ -455,7 +455,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
               '_rev' : $scope.doc['_rev'],
               'alca' : $scope.jsons.alca,
               'lumi' : $scope.jsons.lumi,
-              'skim' : $scope.jsons.skim
+              'skim' : $scope.jsons.skim,
+
             }
     }).success(function(data, status){
       $scope.loadData();
@@ -757,10 +758,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.addRunUnscheduled = function (nameVal, type)
     {
         if($scope.drive[nameVal][type].search("--run") === -1){
-                    $scope.drive[nameVal][type] += " --runUnscheduled";
+                    $scope.data['req'][nameVal]['action'][type]['steps'] += " --runUnscheduled";
         }
         else if($scope.drive[nameVal][type].search("--run") !== -1){
-                $scope.drive[nameVal][type] = $scope.drive[nameVal][type].replace(" --runUnscheduled", "");
+                $scope.data['req'][nameVal]['action'][type]['steps'] = $scope.data['req'][nameVal]['action'][type]['steps'].replace(" --runUnscheduled", "");
         }
     }
   //==================WATCH===================//
