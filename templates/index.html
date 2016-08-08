@@ -484,7 +484,8 @@
                                     </div>
                                     <div class="form-group" style="margin-top: 5px">
                                           <button class="btn btn-success" tooltip="Adds ALCA:autoAlca[dataset] dependant on the JSON AlCa config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getAlCaDatasetValue(name, 'reco')">Add AlCa Matrix step</button>
-                                          <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'reco')">Add Skim Matrix step</button>                                   
+                                          <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'reco')">Add Skim Matrix step</button>  
+<button class="btn btn-success" type="button" ng-click="addRunUnscheduled(name,'reco')">Run Unscheduled</button>                                          
                                     </div>
                                  </div>
                               </accordion-group>
@@ -535,7 +536,8 @@
                                     </div>
                                     <div class="form-group" style="margin-top: 5px">
                                           <button class="btn btn-success" tooltip="Adds ALCA:autoAlca[dataset] dependant on the JSON AlCa config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getAlCaDatasetValue(name, 'skim')">Add AlCa Matrix step</button>
-                                          <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'skim')">Add Skim Matrix step</button>                                   
+                                          <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'skim')">Add Skim Matrix step</button>
+<button class="btn btn-success" type="button" ng-click="addRunUnscheduled(name,'skim')">Run Unscheduled</button>                                            
                                     </div>
                                  </div>
                               </accordion-group>
@@ -586,6 +588,7 @@
                                     <div class="form-group" style="margin-top: 5px">
                                        <button class="btn btn-success" tooltip="Adds ALCA:autoAlca[dataset] dependant on the JSON AlCa config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getAlCaDatasetValue(name, 'mini')">Add AlCa Matrix step</button>
                                              <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'mini')">Add Skim Matrix step</button>
+<button class="btn btn-success" type="button" ng-click="addRunUnscheduled(name,'mini')">Run Unscheduled</button>         
                                     </div>
                                  </div>
                               </accordion-group>
