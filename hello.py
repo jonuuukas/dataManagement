@@ -234,6 +234,8 @@ def test_campaign():
     i = 0   #loop needed to cycle through all the datasets and differ gathered information based on the dataset name
     dynamicLogger={}
     print ("starting the loop thrtough master.conf")
+    rev = couch.get_file(_id)['_rev']
+    
     for line in cfgFile:
         if line.startswith("cfg_path="):
 
@@ -251,12 +253,15 @@ def test_campaign():
 
             log_file.close()
             err_file.close()
+            couch.upload_attachment(_id, rev, str(i)+ "errLog.txt")
+
+            
             
             if str(dynamicLogger[req.keys()[i]]['stderr']).find("Begin fatal exception"):
                 dynamicLogger['flag']="Fatality"    #subzero ftw
             i+=1
-
     cfgFile.close()
+#-----------------Uploading log file-------------------------
     print("finished looping. returning to the AngularJS")
     os.chdir(__curr_dir) ## back to working dir
     return json.dumps(dynamicLogger)
