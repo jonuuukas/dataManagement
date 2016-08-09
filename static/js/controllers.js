@@ -745,7 +745,6 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.alertMsg = {error : true, msg : "Check if the Skim matrix is not empty and if there is the Dataset value!", show : true};
     }
     else{
-      console.log(matrixVal[dsValue]);
       if($scope.data['req'][nameVal]['action'][type]['steps'] == undefined){ //just checkin if comma is needed and also avoiding 'undefined' string added to the steps
         $scope.data['req'][nameVal]['action'][type]['steps'] = "SKIM:" + matrixVal[dsValue];
       }
@@ -757,7 +756,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 //========Checks if --runUnscheduled is inside string and adds/removes accordingly ==========//
   $scope.addRunUnscheduled = function (nameVal, type)
     {
-        if($scope.drive[nameVal][type].search("--run") === -1){
+        if($scope.drive[nameVal][type].search("--runUnscheduled") === -1){
                     if($scope.data['req'][nameVal]['action'][type]['steps'] == undefined){
                         $scope.data['req'][nameVal]['action'][type]['steps'] = " --runUnscheduled";
                     }
