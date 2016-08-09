@@ -47,7 +47,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
                     "skim" : {},
                     "lumi" : {}
                   };
-
+  $scope.testRes = {
+                    "stdout" : {},
+                    "stderr" : {}
+  }
   //=============Actions with datasets===========//
   $scope.addReq = function(name)
   {
