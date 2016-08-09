@@ -485,7 +485,7 @@
                                     <div class="form-group" style="margin-top: 5px">
                                           <button class="btn btn-success" tooltip="Adds ALCA:autoAlca[dataset] dependant on the JSON AlCa config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getAlCaDatasetValue(name, 'reco')">Add AlCa Matrix step</button>
                                           <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'reco')">Add Skim Matrix step</button>  
-<label class="btn {{((check[name].recoUnscheduled) ? 'btn-danger' : 'btn-success')}}" ng-model="check[name].recoUnscheduled" ng-change="addRunUnscheduled(name, 'reco')" btn-checkbox>{{((check[name].recoUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>                                        
+<label class="btn {{((check[name].recoUnscheduled) ? 'btn-danger' : 'btn-success')}}" tooltip="Adds/Removes --runUnscheduled parameter in the driver" tooltip-placement="up" ng-model="check[name].recoUnscheduled" ng-change="addRunUnscheduled(name, 'reco')" btn-checkbox>{{((check[name].recoUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>                                        
                                     </div>
                                  </div>
                               </accordion-group>
@@ -537,7 +537,7 @@
                                     <div class="form-group" style="margin-top: 5px">
                                           <button class="btn btn-success" tooltip="Adds ALCA:autoAlca[dataset] dependant on the JSON AlCa config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getAlCaDatasetValue(name, 'skim')">Add AlCa Matrix step</button>
                                           <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'skim')">Add Skim Matrix step</button>
-<label class="btn {{((check[name].skimUnscheduled) ? 'btn-danger' : 'btn-success')}}" ng-model="check[name].skimUnscheduled" ng-change="addRunUnscheduled(name, 'skim')" btn-checkbox>{{((check[name].skimUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>                                                 
+<label class="btn {{((check[name].skimUnscheduled) ? 'btn-danger' : 'btn-success')}}" tooltip="Adds/Removes --runUnscheduled parameter in the driver" tooltip-placement="up" ng-model="check[name].skimUnscheduled" ng-change="addRunUnscheduled(name, 'skim')" btn-checkbox>{{((check[name].skimUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>                                                 
                                     </div>
                                  </div>
                               </accordion-group>
@@ -588,7 +588,7 @@
                                     <div class="form-group" style="margin-top: 5px">
                                        <button class="btn btn-success" tooltip="Adds ALCA:autoAlca[dataset] dependant on the JSON AlCa config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getAlCaDatasetValue(name, 'mini')">Add AlCa Matrix step</button>
                                              <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'mini')">Add Skim Matrix step</button>
-<label class="btn {{((check[name].miniUnscheduled) ? 'btn-danger' : 'btn-success')}}" ng-model="check[name].miniUnscheduled" ng-change="addRunUnscheduled(name, 'mini')" btn-checkbox>{{((check[name].miniUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>           
+<label class="btn {{((check[name].miniUnscheduled) ? 'btn-danger' : 'btn-success')}}" tooltip="Adds/Removes --runUnscheduled parameter in the driver" tooltip-placement="up" ng-model="check[name].miniUnscheduled" ng-change="addRunUnscheduled(name, 'mini')" btn-checkbox>{{((check[name].miniUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>           
                                     </div>
                                  </div>
                               </accordion-group>
