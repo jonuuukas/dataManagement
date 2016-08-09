@@ -60,7 +60,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
       //add to all sets
       $scope.data['req'][name] = {"id" : name, "action" : {}};
-      $scope.check[name] = {"reco" : false, "skim" : false, "mini" : false};      
+      $scope.check[name] = {"reco" : false, "skim" : false, "mini" : false,"recoUnscheduled":false,"skimUnscheduled":false,"miniUnscheduled":false};      
       $scope.drive[name] = {};
       $scope.allOpt[name] = {};
       $scope.data['req'][name]['prio'] = $scope.data['prio'];
@@ -525,7 +525,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.working_on = false;
       console.log("Error while running the test: " + status);
     });
-    //$scope.updateDoc();
+
   };
   $scope.getAllDocs = function()
   {
@@ -758,10 +758,17 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.addRunUnscheduled = function (nameVal, type)
     {
         if($scope.drive[nameVal][type].search("--run") === -1){
-                    $scope.data['req'][nameVal]['action'][type]['steps'] += " --runUnscheduled";
+                    if($scope.data['req'][nameVal]['action'][type]['steps'] == undefined){
+                        $scope.data['req'][nameVal]['action'][type]['steps'] = " --runUnscheduled";
+                    }
+                    else{
+                        $scope.data['req'][nameVal]['action'][type]['steps'] += " --runUnscheduled";                
+                    }
+                    $scope.check[nameVal][type+"Unscheduled"] = true;
         }
-        else if($scope.drive[nameVal][type].search("--run") !== -1){
+        else if($scope.drive[nameVal][type].search("--runUnscheduled") !== -1){
                 $scope.data['req'][nameVal]['action'][type]['steps'] = $scope.data['req'][nameVal]['action'][type]['steps'].replace(" --runUnscheduled", "");
+                    $scope.check[nameVal][type+"Unscheduled"] = false;
         }
     }
   //==================WATCH===================//
