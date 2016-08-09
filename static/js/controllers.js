@@ -47,10 +47,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
                     "skim" : {},
                     "lumi" : {}
                   };
-  $scope.testRes = {
-                    "stdout" : {},
-                    "stderr" : {}
-  }
+
   //=============Actions with datasets===========//
   $scope.addReq = function(name)
   {
@@ -455,7 +452,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
               '_rev' : $scope.doc['_rev'],
               'alca' : $scope.jsons.alca,
               'lumi' : $scope.jsons.lumi,
-              'skim' : $scope.jsons.skim,
+              'skim' : $scope.jsons.skim
 
             }
     }).success(function(data, status){
@@ -518,6 +515,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
       $scope.data['req'][key]['stderr'] = data[key]['stderr'];
       $scope.data['req'][key]['stdout'] = data[key]['stdout'];
+
+      console.log($scope.data['req'][key]['stderr']);
       console.log("Test run succeeded, check Test Output for results")
     });
     }).error(function(status){
