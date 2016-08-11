@@ -401,7 +401,7 @@
                <accordion close-others="oneAtATime">
                   <accordion-group is-open="status.open">
                      <accordion-heading>
-                        {{name}}
+                        {{name}} <button class="btn btn-success" ng-click="sendToDas()">TestDas</button>
                         <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                      </accordion-heading>
 

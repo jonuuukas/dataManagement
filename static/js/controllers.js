@@ -143,7 +143,29 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       }
     }
   };
+  $scope.sendToDas = function ()
+    {
+    $scope.alertMsg['show'] = false;
+   // $scope.is_tested = false;
+    $http({
+      method: 'POST', 
+      url:'das_driver', 
+      data: {
+              'doc' : $scope.doc, 
+              '_id': $scope.data['_id'],
+              '_rev' : $scope.doc['_rev'],
+              'CMSSW' : $scope.data['CMSSW'],
+              'req' : $scope.data['req']
 
+            }
+    }).success(function(data, status){
+      console.log(data " " + status);
+    }).error(function(status){
+      $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
+      console.log("Error while updating the doc: " + status);
+    }); 
+
+    }
   //================Helper methods==================//
 
   $scope.checkAllChange = function(action)

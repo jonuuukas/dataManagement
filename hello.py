@@ -192,8 +192,62 @@ def get_submit_bash(__release, _id, __scram):
     comm += "echo 'executing step wmcontrol.py'\n"
     comm += "wmcontrol.py --wmtest --req_file=master.conf\n"
     #--------------------------------------------------
-    return comm 
+    return comm
+     
+@app.route('/das_driver', methods=["GET","POST"])
+def das_driver():
+    """
+    Takes the dataset name and checks in DAS if it's in there, if the dataset is stored
+    in disk and if so - download the needed .root file for cmsRun to launch
+    """
+    def check_ds():
+        proc = subprocess.call("eval `scramv1 runtime -sh`; cat /afs/cern.ch/user/j/jsiderav/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY=$(voms-proxy-info --path); das_client.py  --limit 0 --query 'site dataset="+key+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log_file,stderr=err_file,shell=True)
+        log_file.seek(0)
+        err_file.seek(0)
+        text = log_file.read()
+        data = json.loads(text)
+        for item in data['data']:
+            for site in item['site']:
+                if 'dataset_fraction' in site and site['dataset_fraction']=="100.00%" and site['kind']=="Disk":
+                    print site['name']
+                    proc = subprocess.call("eval `scramv1 runtime -sh`; cat /afs/cern.ch/user/j/jsiderav/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY=$(voms-proxy-info --path); das_client.py  --limit 10 --query 'file dataset="+key+" site="+site['name']+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log2_file, stderr=err2_file, shell=True)
+                    log2_file.seek(0)
+                    err2_file.seek(0)
+                    text2 = log2_file.read()
+                    data2 = json.loads(text2)
+                    for item2 in data2['data']:
+                        for root in item2['file']:
+                            print root['name']
+                            return root['name']
+        print ("Something is not right with me")
+        return ("No")
+            
+    data = json.loads(request.get_data())
+    __release = data['CMSSW']
+    _id = data['_id']
+    _rev = data['_rev']
+    doc = json.dumps(data['doc'])
+    req = data['req']
+    os.chdir(WORK_DIR + "/Test_Folder/"+__release +"/src")
+    print(req.keys()[0])
+    i = 0
+    for key in req.keys():
+        log_file = file('dasTest_out'+str(i)+'.txt','w+')
+        err_file = file('dasTest_err'+str(i)+'.txt','w+')
+        log2_file = file('dasTest_2out'+str(i)+'.txt','w+')
+        err2_file = file('dasTest_2err'+str(i)+'.txt','w+')
+        print key
+        check_ds()
+        i+=1
+        log_file.close()
+        err_file.close()
+        log2_file.close()
+        err2_file.close()
 
+    
+                
+
+    return "none"
 @app.route('/test_campaign', methods=["GET","POST"])
 def test_campaign():
     """
@@ -222,7 +276,7 @@ def test_campaign():
     log_file = file('logTest.txt','w')
     err_file = file('log2Test.txt','w')
     proc = subprocess.Popen(['bash', 'tmp_test.sh'],
-                        stdout=log_file,stderr=err_file,close_fds=True)
+                        stdout=log_file,stderr=err_file,close_fds=True)			
     log_file.close()
     err_file.close()
     #_ret_code = proc.wait()
@@ -253,9 +307,6 @@ def test_campaign():
             log_file.close()
             err_file.close()
 
-
-            
-            
             if str(dynamicLogger[req.keys()[i]]['stderr']).find("Begin fatal exception"):
                 dynamicLogger['flag']="Fatality"    #subzero ftw
             i+=1
