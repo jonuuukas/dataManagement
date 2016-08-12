@@ -201,6 +201,10 @@ def das_driver():
     in disk and if so - download the needed .root file for cmsRun to launch
     """
     def check_ds():
+        """
+        Local scope method which loops through the result of das_client queries, 
+        exits on first found result, doesn't bother too much
+        """
         proc = subprocess.call("eval `scramv1 runtime -sh`; cat /afs/cern.ch/user/j/jsiderav/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY=$(voms-proxy-info --path); das_client.py  --limit 0 --query 'site dataset="+key+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log_file,stderr=err_file,shell=True)
         log_file.seek(0)
         err_file.seek(0)
@@ -208,7 +212,7 @@ def das_driver():
         data = json.loads(text)
         for item in data['data']:
             for site in item['site']:
-                if 'dataset_fraction' in site and site['dataset_fraction']=="100.00%" and site['kind']=="Disk":
+                if 'dataset_fraction' in site and site['kind']=="Disk":
                     print site['name']
                     proc = subprocess.call("eval `scramv1 runtime -sh`; cat /afs/cern.ch/user/j/jsiderav/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY=$(voms-proxy-info --path); das_client.py  --limit 10 --query 'file dataset="+key+" site="+site['name']+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log2_file, stderr=err2_file, shell=True)
                     log2_file.seek(0)
@@ -229,15 +233,16 @@ def das_driver():
     doc = json.dumps(data['doc'])
     req = data['req']
     os.chdir(WORK_DIR + "/Test_Folder/"+__release +"/src")
-    print(req.keys()[0])
     i = 0
+    fileNames = {}
     for key in req.keys():
+        fileNames[key] = {}
         log_file = file('dasTest_out'+str(i)+'.txt','w+')
         err_file = file('dasTest_err'+str(i)+'.txt','w+')
         log2_file = file('dasTest_2out'+str(i)+'.txt','w+')
         err2_file = file('dasTest_2err'+str(i)+'.txt','w+')
         print key
-        check_ds()
+        fileNames[key]['file'] = check_ds()
         i+=1
         log_file.close()
         err_file.close()
@@ -247,7 +252,7 @@ def das_driver():
     
                 
 
-    return "none"
+    return json.dumps(fileNames)
 @app.route('/test_campaign', methods=["GET","POST"])
 def test_campaign():
     """

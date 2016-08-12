@@ -390,6 +390,10 @@
                      <button type="submit" class="btn btn-danger" ng-click="removeReq(new_dsName)"> 
                         <div class="glyphicon glyphicon-minus" aria-hidden="true"></div> Remove
                      </button>
+                    <button type="submit" class="btn btn-warning" ng-click="sendToDas()"> 
+                        <i class="fa fa-folder-o" aria-hidden="true"></i>                        
+                        Get input files
+                     </button>
                   </div>
                   <hr style="border-top: 3px solid #eee">
                </div>
@@ -401,7 +405,7 @@
                <accordion close-others="oneAtATime">
                   <accordion-group is-open="status.open">
                      <accordion-heading>
-                        {{name}} <button class="btn btn-success" ng-click="sendToDas()">TestDas</button>
+                        {{name}}
                         <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                      </accordion-heading>
 

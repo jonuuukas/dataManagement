@@ -159,9 +159,25 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
             }
     }).success(function(data, status){
-      console.log(data " " + status);
+
+      angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
+        $scope.data['req'][key]['file'] = data[key]['file'];
+        console.log($scope.data['req'][key]['file']);      
+        if ($scope.data['req'][key]['file']=="No"){
+                    $scope.alertMsg = {error : true, msg : "Failed retrieving file in DAS", show : true};            
+                }
+        else{
+                    angular.forEach($scope.data['req'][key]['action'], function (value2,key2){
+                        if($scope.data['req'][key]['action'][key2] != "" && $scope.allOpt[key][key2] != undefined){
+                                $scope.data['req'][key]['action'][key2]['filein'] = data[key]['file']; 
+
+                                $scope.allOpt[key][key2]['filein'] = 'filein';                   
+                        };                    
+                    });        
+                };
+            });
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
+      $scope.alertMsg = {error : true, msg : "Failed contacting DAS", show : true};
       console.log("Error while updating the doc: " + status);
     }); 
 
@@ -353,6 +369,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         delete temp['n'];
         $scope.drive[ds][action] += temp['conditions'] ? " --conditions " + (temp['conditions'] || "") : "";
         delete temp['conditions'];
+        $scope.drive[ds][action] += temp['filein'] ? " --filein " + (temp['filein'] || "") : "";
+        delete temp['filein'];
         $scope.drive[ds][action] += temp['eventcontent'] ? " --eventcontent " + (temp['eventcontent'] || "") : "";
         delete temp['eventcontent'];        
         $scope.drive[ds][action] += temp['datatier'] ? " --datatier " + (temp['datatier'] || "") : "";
@@ -401,6 +419,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         delete temp['steps'];  
         $scope.drive[ds][action] += temp['n'  ] ? " -n " + (temp['n'] || "") : "";
         delete temp['n'];
+        $scope.drive[ds][action] += temp['filein'] ? " --filein" + (temp['filein'] || "") : "";
+        delete temp['filein'];
         $scope.drive[ds][action] += temp['conditions'] ? " --conditions " + (temp['conditions'] || " ") : "";
         delete temp['conditions'];
         $scope.drive[ds][action] += temp['skimoption'] ? " --skimoption " + (temp['skimoption'] || " ") : "";
@@ -416,6 +436,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         delete temp['steps'];
         $scope.drive[ds][action] += temp['n'] ? " -n " + (temp['n'] || " ") : "";
         delete temp['n'];
+        $scope.drive[ds][action] += temp['filein'] ? " --filein" + (temp['filein'] || "") : "";
+        delete temp['filein'];
         $scope.drive[ds][action] += " --no_exec";
         $scope.drive[ds][action] += " --python_filename";
         $scope.drive[ds][action] += " mini_" + $scope.data['era'] + "_" + ds.split("/")[1] + ".py";
@@ -824,7 +846,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       }
     }
   },true);
-
+    
   $scope.$watch("defCon", function(newValue, oldValue) {
     for (action in newValue){
       if (oldValue[action] == undefined || newValue[action] != oldValue[action]){
