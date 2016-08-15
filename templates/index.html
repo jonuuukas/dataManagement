@@ -392,7 +392,7 @@
                      </button>
                     <button type="submit" class="btn btn-warning" ng-click="sendToDas()"> 
                         <i class="fa fa-folder-o" aria-hidden="true"></i>                        
-                        Get input files
+                        Get input file
                      </button>
                   </div>
                   <hr style="border-top: 3px solid #eee">
@@ -405,6 +405,7 @@
                <accordion close-others="oneAtATime">
                   <accordion-group is-open="status.open">
                      <accordion-heading>
+                        <i class="fa fa-times fa-lg" tooltip="Input file not found or not on disk. Please input it manually" tooltip-placement="right" style="color:#d9534f" aria-hidden="true" ng-show="data['req'][name]['err']"></i>
                         {{name}}
                         <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                      </accordion-heading>

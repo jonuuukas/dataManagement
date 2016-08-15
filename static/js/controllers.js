@@ -146,6 +146,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.sendToDas = function ()
     {
     $scope.alertMsg['show'] = false;
+    $scope.working_on = true;
    // $scope.is_tested = false;
     $http({
       method: 'POST', 
@@ -159,24 +160,27 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
             }
     }).success(function(data, status){
-
       angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
         $scope.data['req'][key]['file'] = data[key]['file'];
         console.log($scope.data['req'][key]['file']);      
         if ($scope.data['req'][key]['file']=="No"){
-                    $scope.alertMsg = {error : true, msg : "Failed retrieving file in DAS", show : true};            
+                    $scope.alertMsg = {error : true, msg : "Failed retrieving file in DAS", show : true};   
+                    $scope.data['req'][key]['err'] = true;         
                 }
+
         else{
                     angular.forEach($scope.data['req'][key]['action'], function (value2,key2){
                         if($scope.data['req'][key]['action'][key2] != "" && $scope.allOpt[key][key2] != undefined){
                                 $scope.data['req'][key]['action'][key2]['filein'] = data[key]['file']; 
-
+                                $scope.data['req'][key]['err'] = false;         
                                 $scope.allOpt[key][key2]['filein'] = 'filein';                   
                         };                    
                     });        
                 };
+            $scope.working_on = false;
             });
     }).error(function(status){
+        $scope.working_on = false
       $scope.alertMsg = {error : true, msg : "Failed contacting DAS", show : true};
       console.log("Error while updating the doc: " + status);
     }); 
