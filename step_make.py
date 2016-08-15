@@ -37,7 +37,7 @@ class MasterConfMaker:
         master = file('master.conf','w')
         header = "[DEFAULT]\n"
         header += "group=ppd\n"
-        header += "user=mliutkut\n"
+        header += "user=jsiderav\n"
         header += "request_type=ReReco\n"
         header += "release=%s\n" % (__release)
         header += "globaltag=%s\n" % (GT)

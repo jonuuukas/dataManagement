@@ -1,4 +1,5 @@
 var myApp = angular.module('myApp', ['ui.bootstrap']);
+var loader = angular.module('loader', ['angular-loading-bar']);
 myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
 
@@ -17,6 +18,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
   $scope.working_on = false;
   $scope.alertMsg = {error : false, msg : "", show : false};
+  $scope.is_tested = false;
 
   $scope.doc = {};
   $scope.check = {};
@@ -25,16 +27,19 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.defCon = {};
   $scope.recoOpt = {
                     "steps" : "steps",
-                    "conditions": "conditions" 
+                    "conditions": "conditions",
+                    "n":"n" 
                     };
   $scope.skimOpt = {
                   "steps" : "steps",
                   "conditions": "conditions", 
-                  "skimoption": "skimoption"
+                  "skimoption": "skimoption",
+                  "n":"n" 
                   };
   $scope.miniOpt = {
                   "steps": "steps", 
-                  "conditions": "conditions"
+                  "conditions": "conditions",
+                  "n":"n" 
                   };
   $scope.defOpt = {"reco" : $scope.recoOpt, "skim" : $scope.skimOpt, "mini" : $scope.miniOpt};
   $scope.jsons = {
@@ -42,7 +47,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
                     "skim" : {},
                     "lumi" : {}
                   };
-
+  $scope.testRes = {
+                    "stdout" : {},
+                    "stderr" : {}
+  }
   //=============Actions with datasets===========//
   $scope.addReq = function(name)
   {
@@ -52,7 +60,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
       //add to all sets
       $scope.data['req'][name] = {"id" : name, "action" : {}};
-      $scope.check[name] = {"reco" : false, "skim" : false, "mini" : false};      
+      $scope.check[name] = {"reco" : false, "skim" : false, "mini" : false,"recoUnscheduled":false,"skimUnscheduled":false,"miniUnscheduled":false};      
       $scope.drive[name] = {};
       $scope.allOpt[name] = {};
       $scope.data['req'][name]['prio'] = $scope.data['prio'];
@@ -135,7 +143,49 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       }
     }
   };
+  $scope.sendToDas = function ()
+    {
+    $scope.alertMsg['show'] = false;
+    $scope.working_on = true;
+   // $scope.is_tested = false;
+    $http({
+      method: 'POST', 
+      url:'das_driver', 
+      data: {
+              'doc' : $scope.doc, 
+              '_id': $scope.data['_id'],
+              '_rev' : $scope.doc['_rev'],
+              'CMSSW' : $scope.data['CMSSW'],
+              'req' : $scope.data['req']
 
+            }
+    }).success(function(data, status){
+      angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
+        $scope.data['req'][key]['file'] = data[key]['file'];
+        console.log($scope.data['req'][key]['file']);      
+        if ($scope.data['req'][key]['file']=="No"){
+                    $scope.alertMsg = {error : true, msg : "Failed retrieving file in DAS", show : true};   
+                    $scope.data['req'][key]['err'] = true;         
+                }
+
+        else{
+                    angular.forEach($scope.data['req'][key]['action'], function (value2,key2){
+                        if($scope.data['req'][key]['action'][key2] != "" && $scope.allOpt[key][key2] != undefined){
+                                $scope.data['req'][key]['action'][key2]['filein'] = data[key]['file']; 
+                                $scope.data['req'][key]['err'] = false;         
+                                $scope.allOpt[key][key2]['filein'] = 'filein';                   
+                        };                    
+                    });        
+                };
+            $scope.working_on = false;
+            });
+    }).error(function(status){
+        $scope.working_on = false
+      $scope.alertMsg = {error : true, msg : "Failed contacting DAS", show : true};
+      console.log("Error while updating the doc: " + status);
+    }); 
+
+    }
   //================Helper methods==================//
 
   $scope.checkAllChange = function(action)
@@ -317,10 +367,14 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         }
       }
         
-        $scope.drive[ds][action] += temp['steps'] ? " -s " + (temp['steps'] || "") : "";
+        $scope.drive[ds][action] += temp['steps'  ] ? " -s " + (temp['steps'] || "") : "";
         delete temp['steps'];
+        $scope.drive[ds][action] += temp['n'  ] ? " -n " + (temp['n'] || "") : "";
+        delete temp['n'];
         $scope.drive[ds][action] += temp['conditions'] ? " --conditions " + (temp['conditions'] || "") : "";
         delete temp['conditions'];
+        $scope.drive[ds][action] += temp['filein'] ? " --filein " + (temp['filein'] || "") : "";
+        delete temp['filein'];
         $scope.drive[ds][action] += temp['eventcontent'] ? " --eventcontent " + (temp['eventcontent'] || "") : "";
         delete temp['eventcontent'];        
         $scope.drive[ds][action] += temp['datatier'] ? " --datatier " + (temp['datatier'] || "") : "";
@@ -366,7 +420,11 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.drive[ds][action] = "";
         $scope.drive[ds][action] = "cmsDriver.py skim";
         $scope.drive[ds][action] += temp['steps'] ? " -s " + (temp['steps'] || "") : "";
-        delete temp['steps'];     
+        delete temp['steps'];  
+        $scope.drive[ds][action] += temp['n'  ] ? " -n " + (temp['n'] || "") : "";
+        delete temp['n'];
+        $scope.drive[ds][action] += temp['filein'] ? " --filein" + (temp['filein'] || "") : "";
+        delete temp['filein'];
         $scope.drive[ds][action] += temp['conditions'] ? " --conditions " + (temp['conditions'] || " ") : "";
         delete temp['conditions'];
         $scope.drive[ds][action] += temp['skimoption'] ? " --skimoption " + (temp['skimoption'] || " ") : "";
@@ -382,6 +440,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         delete temp['steps'];
         $scope.drive[ds][action] += temp['n'] ? " -n " + (temp['n'] || " ") : "";
         delete temp['n'];
+        $scope.drive[ds][action] += temp['filein'] ? " --filein" + (temp['filein'] || "") : "";
+        delete temp['filein'];
         $scope.drive[ds][action] += " --no_exec";
         $scope.drive[ds][action] += " --python_filename";
         $scope.drive[ds][action] += " mini_" + $scope.data['era'] + "_" + ds.split("/")[1] + ".py";
@@ -433,24 +493,90 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.updateDoc = function()
   {
     $scope.alertMsg['show'] = false;
+   // $scope.is_tested = false;
     $http({
       method: 'POST', 
       url:'update_file', 
       data: {
               'doc' : $scope.doc, 
               '_id': $scope.data['_id'],
-              '_rev' : $scope.doc['_rev']
+              '_rev' : $scope.doc['_rev'],
+              'alca' : $scope.jsons.alca,
+              'lumi' : $scope.jsons.lumi,
+              'skim' : $scope.jsons.skim
+
             }
     }).success(function(data, status){
       $scope.loadData();
       $scope.alertMsg = {error : false, msg : "Action was successful.", show : true};     
-      console.log("success" + data + " " + status);
+      console.log("Success updating the doc: " + data + " " + status);
     }).error(function(status){
       $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
-      console.log("error:" + status);
+      console.log("Error while updating the doc: " + status);
     }); 
   };
+//=============Runs through the datasets and checks if there is data in the stderr n stdout to show the output=========//
+  $scope.checkTests = function()
+    {
+          console.log("checking the tests");
+          angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
+          $scope.data['req'][key]["flag"] = "";
+          if( $scope.data['req'][key]['stderr'] != undefined && $scope.data['req'][key]['stdout'] != undefined){
+                $scope.is_tested = true;            
+            }
+          else {
+            $scope.is_tested = false;
+            $scope.data['req'][key]["stderr"] = "";
+            $scope.data['req'][key]["stdout"] = "";
+            }
+          //$scope.data['req'][key]['stdout'] = "Tests are being run. Please wait";
 
+        });
+
+    };
+  //==========calls flask script which will only run through cmsRun in the cmsenv=====
+  //==========to check if the data input for all the datasets is correct=============
+  $scope.testDoc = function()
+  {
+    $scope.alertMsg['show'] = false;
+    $scope.working_on = true;
+    $scope.is_tested = true;
+    //$scope.cleanTests();
+    $http({
+      method: 'POST',
+      url:'test_campaign',
+      data:{
+            'doc' : $scope.doc,
+            '_id' : $scope.data['_id'],
+            '_rev': $scope.doc['_rev'],
+            'CMSSW' : $scope.data['CMSSW'],
+            'req' : $scope.data['req']
+            }
+    }).success(function(data,status){
+      if (data == 'No scram'){
+        $scope.alertMsg = {error : true, msg : "Test was unsuccessful. Scram version was not found for this CMSSW version", show : true};
+      }
+      else if (data['flag'] == "Fatality"){
+        $scope.alertMsg = {error : true, msg : "Fatal exception was found. See Test Output", show : true};
+      }
+      else{
+      $scope.alertMsg = {error:false, msg: "No fatal errors. See Test Output to be sure", show : true};
+    }
+    $scope.working_on = false;
+    angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
+      $scope.data['req'][key]['stderr'] = data[key]['stderr'];
+      $scope.data['req'][key]['stdout'] = data[key]['stdout'];
+
+      console.log($scope.data['req'][key]['stderr']);
+      console.log("Test run succeeded, check Test Output for results")
+    });
+    }).error(function(status){
+      $scope.alertMsg = {error: true, msg : "Test failed, check the logs", show : true};
+      $scope.working_on = false;
+      console.log("Error while running the test: " + status);
+    });
+
+  };
   $scope.getAllDocs = function()
   {
     $http({
@@ -462,9 +588,9 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         var iteratee = tmp[i];
         $scope.list.push(iteratee['id']); 
       }
-      console.log("success");
+      console.log("Success. Got all docs");
     }).error(function(status){
-      console.log("error:" + status);
+      console.log("Error while getting docs:" + status);
     }); 
   };
 
@@ -494,17 +620,18 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.loadData();
       $scope.getAllDocs();
       $scope.inTheList = true;
-      console.log("success" + data + " " + status);
+      console.log("Success while saving the doc" + data + " " + status);
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Action was successful.", show : true};
+      $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
       $scope.working_on = false;      
-      console.log("error:" + status);
+      console.log("Error while saving the doc:" + status);
     });  
   };
 
   $scope.loadData = function()
   {
     console.log("id: " + $scope.data['_id']);
+    $scope.working_on = false;
     $http({
             method: 'POST', 
             url:'load_data', 
@@ -534,11 +661,11 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
           $scope.formDriver(ds,action);
         }
       }
-
-      $scope.alertMsg = {error : false, msg : "Action was successful.", show : true};
+      $scope.checkTests();
+      $scope.alertMsg = {error : false, msg : "Loading was successful.", show : true};
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
-      console.log("error:" + status);
+      $scope.alertMsg = {error : true, msg : "Loading was unsuccessful.", show : true};
+      console.log("Error while loading:" + status);
     }); 
   };
 
@@ -555,7 +682,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         '_id': $scope.data['_id'],
         '_rev' : $scope.doc['_rev'],
         'CMSSW' : $scope.data['CMSSW']
-    }}).success(function(data, status){
+    }    
+      }).success(function(data, status){
       $scope.working_on = false;
       if (data == '0'){
         $scope.alertMsg = {error : false, msg : "Submit was successful.", show : true};
@@ -565,16 +693,133 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.doc['submitted'] = false;
       } else {
         $scope.alertMsg = {error : true, msg : "Submit was unsuccessful. Something went wrong, better check the logs!", show : true};
-        console.log("Something went wrong" + data +" status: " + status);
+        console.log("Submit went wrong:" + data +" status: " + status);
       }
-      console.log("success" + status);
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Action was unsuccessful", show : true};
+      $scope.alertMsg = {error : true, msg : "Submitting was unsuccessful", show : true};
       $scope.working_on = false;
-      console.log("error: " + status);
+      console.log("Submit error: " + status);
     });
   };
+  //======================Copy to clipboard button for the Full JSON fields===================================
+  $scope.copyToClipboard = function(text)
+  {
+    var textArea = document.createElement("textarea");
+    textArea.style = "none";
+    textArea.value = angular.toJson(text);
+    console.log(angular.toJson(text));
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+                var successful = document.execCommand('copy');
+                if (!successful) throw successful;
+            } catch (err) {
+                console.log("failed to copy", text);
+            }
+    document.body.removeChild(textArea);
+  };
+  //=======Get autoSkim matrix and puts into the input field=====//
+  $scope.getSkimMatrixValue = function ()
+  {
+    $http({
+      method: 'POST', 
+      url: 'get_skim_matrix_value', 
+      data: {
+        'CMSSW' : $scope.data['CMSSW']
+    }
+  }).success(function(data,status){
+      console.log("Success while getting Skim matrix value" + angular.toJson(data));
+      $scope.jsons.skim = data;
+    }).error(function(status){
+      console.log("Error on getting Skim matrix value " + status);
+    });
 
+  };
+  //=======Get autoSkim matrix and puts into the input field=====//
+  $scope.getAlCaMatrixValue = function ()
+  {
+    $http({
+      method: 'POST', 
+      url: 'get_alca_matrix_value', 
+      data: {
+        'CMSSW' : $scope.data['CMSSW']
+    }
+  }).success(function(data,status){
+      console.log("Success on getting AlCa matrix value " + angular.toJson(data));
+      $scope.jsons.alca = data;
+    }).error(function(status){
+      console.log("Error on getting AlCa matrix value " + status);
+    });
+
+  };
+  //===============Get the dataset's key value from the AlCa matrix================//
+  $scope.getAlCaDatasetValue = function (nameVal, type)
+  {
+    console.log("clicked " + nameVal);
+    var slashCounter = 0;
+    for (i = 1; i < nameVal.length; i++){     //looping through all the letters in the full dataset name to only get the DataSet(f.e. SingleElectron)
+        if (nameVal.charAt(i)==='/'){
+          var slashIndex = i;
+          break;
+        }
+    }
+    dsValue = nameVal.substring(1,slashIndex);
+    matrixVal = $scope.jsons.alca;
+    if(matrixVal[dsValue] == undefined){
+      $scope.alertMsg = {error : true, msg : "Check if the AlCa matrix is not empty and if there is the Dataset value!", show : true};
+    }
+    else{
+      console.log(matrixVal[dsValue]);
+      if($scope.data['req'][nameVal]['action'][type]['steps'] == undefined){ //just checkin if comma is needed and also avoiding 'undefined' string added to the steps
+        $scope.data['req'][nameVal]['action'][type]['steps'] = "ALCA:" + matrixVal[dsValue];
+      }
+      else{
+        $scope.data['req'][nameVal]['action'][type]['steps'] += ",ALCA:" + matrixVal[dsValue];
+      }
+    }
+  }
+  //===============Get the dataset's key value from the AlCa matrix================//
+  $scope.getSkimDatasetValue = function (nameVal, type)
+  {
+    console.log("clicked " + nameVal);
+    var slashCounter = 0;
+    for (i = 1; i < nameVal.length; i++){     //looping through all the letters in the full dataset name to only get the DataSet(f.e. SingleElectron)
+        if (nameVal.charAt(i)==='/'){
+          var slashIndex = i;
+          break;
+        }
+    }
+    dsValue = nameVal.substring(1,slashIndex);
+    matrixVal = $scope.jsons.skim;
+    if(matrixVal[dsValue] == undefined){
+      $scope.alertMsg = {error : true, msg : "Check if the Skim matrix is not empty and if there is the Dataset value!", show : true};
+    }
+    else{
+      if($scope.data['req'][nameVal]['action'][type]['steps'] == undefined){ //just checkin if comma is needed and also avoiding 'undefined' string added to the steps
+        $scope.data['req'][nameVal]['action'][type]['steps'] = "SKIM:" + matrixVal[dsValue];
+      }
+      else{
+        $scope.data['req'][nameVal]['action'][type]['steps'] += ",SKIM:" + matrixVal[dsValue];
+      }
+    }
+  }
+//========Checks if --runUnscheduled is inside string and adds/removes accordingly ==========//
+  $scope.addRunUnscheduled = function (nameVal, type)
+    {
+        if($scope.drive[nameVal][type].search("--runUnscheduled") === -1){
+                    if($scope.data['req'][nameVal]['action'][type]['steps'] == undefined){
+                        $scope.data['req'][nameVal]['action'][type]['steps'] = " --runUnscheduled";
+                    }
+                    else{
+                        $scope.data['req'][nameVal]['action'][type]['steps'] += " --runUnscheduled";                
+                    }
+                    $scope.check[nameVal][type+"Unscheduled"] = true;
+        }
+        else if($scope.drive[nameVal][type].search("--runUnscheduled") !== -1){
+                $scope.data['req'][nameVal]['action'][type]['steps'] = $scope.data['req'][nameVal]['action'][type]['steps'].replace(" --runUnscheduled", "");
+                    $scope.check[nameVal][type+"Unscheduled"] = false;
+        }
+    }
   //==================WATCH===================//
 
   $scope.$watch("data['req']", function(newValue, oldValue) {
@@ -605,7 +850,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       }
     }
   },true);
-
+    
   $scope.$watch("defCon", function(newValue, oldValue) {
     for (action in newValue){
       if (oldValue[action] == undefined || newValue[action] != oldValue[action]){
@@ -688,3 +933,4 @@ myApp.directive("inlineEditable", function () {
         }
     }
 });
+

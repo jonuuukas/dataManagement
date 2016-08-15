@@ -7,26 +7,33 @@
       <script type=text/javascript src="static/js/angular.js"></script>
       <script type=text/javascript src="static/js/controllers.js"></script>
       <script type=text/javascript src="static/js/ui-bootstrap-tpls-0.12.1.js"></script>   
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="https://use.fontawesome.com/cc110ae827.js"></script>
+
    </head>
    <body ng-app="myApp" ng-controller="myAppCtrl">
-      <div class="container" style="margin-bottom: 50px" >
+      <div class="container col-lg-12" style="margin-bottom: 50px" >
          <!-- Pavadinimas -->
          <div class="row">
-            <div class="col-lg-12">
-               <h1>Data management application</h1>
+            <div class="col-lg-16">
+               <h1 class="title">Data management application</h1>
             </div>
          </div>
-         <!-- laukai    -->
          <form class="form-inline" role="form" >
+            <!-- meniu laukai    -->
             <div class="row">
                <div class="col-lg-12">
 
                   <input type="text" ng-model="data['_id']" typeahead="elem for elem in list | filter:$viewValue | limitTo:10" class="form-control">
 
-                  <button type="submit" class="btn btn-primary" ng-if="inTheList" ng-click="loadData()">Load data</button>
-                  <button type="submit" class="btn btn-primary" ng-if="!doc['submitted'] && inTheList" ng-click="updateDoc()">Update doc</button>
-                  <button type="submit" class="btn btn-primary" ng-if="!inTheList" ng-click="saveDoc()">Save doc</button>
-                  <button type="submit" class="btn btn-danger" ng-if="!doc['submitted'] && inTheList" ng-click="submitCampaign()">Submit campaign</button> 
+                  <button type="submit" tooltip="Restore the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="inTheList" ng-click="loadData()">Load data <i class="fa fa-cloud-upload" aria-hidden="true"></i></button>
+                  <button type="submit" tooltip="Save the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="!doc['submitted'] && inTheList" ng-click="updateDoc()">Update doc <i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+                  <button type="submit" tooltip="Test current datasets by running them through cmsRun" tooltip-placement="bottom" class="btn btn-warning" ng-if="!doc['submitted'] && inTheList" ng-click="testDoc()">Test Doc <i class="fa fa-info-circle" aria-hidden="true"></i></button>
+       
+                  <button type="submit"  tooltip="Save the current campaign" tooltip-placement="bottom"  class="btn btn-primary" ng-if="!inTheList" ng-click="saveDoc()">Save doc <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+
+
+                  <button type="submit" tooltip="WARNING: You can only submit the campaign once. Any changes will have to be saved to another campaign" tooltip-placement="bottom" class="btn btn-danger" ng-if="!doc['submitted'] && inTheList" ng-click="submitCampaign()">Submit campaign <i class="fa fa-sign-out" aria-hidden="true"></i></button> 
 
                   <img ng-show="working_on" ng-src="https://twiki.cern.ch/twiki/pub/TWiki/TWikiDocGraphics/processing-bg.gif" src="https://twiki.cern.ch/twiki/pub/TWiki/TWikiDocGraphics/processing-bg.gif" class="ng-hide">
                   
@@ -39,8 +46,51 @@
                
             </div>
 
-            
+            <!---SHIT IS REAL FROM HERE -->
+            <div class="row">
+               <div class="col-lg-12 h4">
+               </div>
+            </div>
+            <accordion close-others="false" ng-show="is_tested">
+            <accordion-group is-open="status.open">
+               <accordion-heading>
+                  Test Output
+                  <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                  </accordion-heading>
+                     <div class="row" ng-repeat="(name, info) in data['req']">
+                     <div class='col-lg-12'>
+                     <accordion close-others="oneAtATime">
+                        <accordion-group is-open="secondStatus.open">
+                           
+                                       <accordion-heading>
+                                       {{name}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': secondStatus.open, 'glyphicon-chevron-right': !secondStatus.open}"></i>
+                                       </accordion-heading>
+                                          <div class ="col-lg-12">
+                                          <ul class="nav nav-tabs">
+                                           <li ng-click="item=1"><a data-toggle="tab">StdErr</a>  </li>
+                                           <li ng-click="item=2"> <a data-toggle="tab"> StdOut</a></li>
+                                          </ul>
+                                 
+                                               <div class="tab-content" ng-init='item=1'>
+                                                    <div ng-show='item == 1'>
+                                                      <h3>StdErr</h3>
+                                                      <pre id="testOutput" style="margin-top: 5px">{{info['stderr']}}</pre>
+                                                   </div>
+                                                   <div ng-show='item == 2'>
+                                                      <h3>StdOut</h3>
+                                                      <pre id="testOutput" style="margin-top: 5px">{{info['stdout']}}</pre>
+                                                   </div>
+                                                </div>
 
+                                          </div>
+                        </accordion-group>
+                     </accordion>
+                     </div>
+                     </div>
+
+            </accordion-group>
+            </accordion>
+            <!---TO HERE -->
             <div class="row">
                <div class="col-lg-12 h4">
                </div>
@@ -107,9 +157,10 @@
                <div class="row">
                   <div class="col-lg-12" ng-show="checkAll.reco">
                      <hr>
-                     <accordion-group >
+                     <accordion-group is-open="secondStatus.open">
                         <accordion-heading>
                            Default RECO configurations:
+                           <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': secondStatus.open, 'glyphicon-chevron-right': !secondStatus.open}"></i>
                         </accordion-heading>
                         <hr>                                 
                         <h4>Default RECO configurations:</h4>
@@ -123,8 +174,8 @@
                                        <div class="input-group">
                                           <input type="text" class="form-control" placeholder="{{txt}}" ng-model="defCon['reco'][txt]">
                                           <span class="input-group-btn">
-                                             <button class="btn btn-danger btn-add" type="button" ng-click="removeDefExtra('Default', 'reco', txt, '')">
-                                                <span class="glyphicon glyphicon-minus"></span>
+                                             <button class="btn btn-warning btn-add" type="button" ng-click="defCon['reco'][txt] = null">
+                                                <span class="glyphicon glyphicon-remove"></span>
                                              </button>
                                           </span>
                                        </div>                                                 
@@ -155,7 +206,8 @@
                                  </button>
                                  
                               </span>
-                           </div>                                    
+                           </div> 
+                                                   
                         </div>
                      </div>
 
@@ -168,9 +220,10 @@
                <div class="row">
                   <div class="col-lg-12" ng-show="checkAll.skim">
                      <hr>
-                     <accordion-group >
+                     <accordion-group is-open="thirdStatus.open">
                      <accordion-heading>
                         Default Skim configurations:
+                        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': thirdStatus.open, 'glyphicon-chevron-right': !thirdStatus.open}"></i>
                      </accordion-heading>
 
                      <div class="col-lg-4 form-horizontal">
@@ -182,8 +235,8 @@
                                     <div class="input-group">
                                        <input type="text" class="form-control" placeholder="{{txt}}" ng-model="defCon['skim'][txt]">
                                        <span class="input-group-btn">
-                                          <button class="btn btn-danger btn-add" type="button" ng-click="removeDefExtra('Default', 'skim', txt, '')">
-                                             <span class="glyphicon glyphicon-minus"></span>
+                                          <button class="btn btn-warning btn-add" type="button" ng-click="defCon['skim'][txt] = null">
+                                             <span class="glyphicon glyphicon-remove"></span>
                                           </button>
                                        </span>
                                     </div>                                                 
@@ -207,7 +260,8 @@
                                  </button>
                                  
                               </span>
-                           </div>                                    
+                           </div>     
+                                               
                         </div>
                      </div>
 
@@ -218,9 +272,10 @@
                <div class="row">
                   <div class="col-lg-12" ng-show="checkAll.mini">
                      <hr>
-                     <accordion-group >
+                     <accordion-group is-open="fourthStatus.open">
                      <accordion-heading>
                         Default MiniAOD configurations:
+                        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': fourthStatus.open, 'glyphicon-chevron-right': !fourthStatus.open}"></i>
                      </accordion-heading>
                      
                      <div class="col-lg-4 form-horizontal">                     
@@ -231,11 +286,12 @@
                                  <div class="input-group">
                                     <input type="text" class="form-control" placeholder="{{txt}}" ng-model="defCon['mini'][txt]">
                                     <span class="input-group-btn">
-                                       <button class="btn btn-danger btn-add" type="button" ng-click="removeDefExtra('Default', 'mini', txt, '')">
-                                          <span class="glyphicon glyphicon-minus"></span>
+                                       <button class="btn btn-warning btn-add" type="button" ng-click="defCon['mini'][txt] = null">
+                                          <span class="glyphicon glyphicon-remove"></span>
                                        </button>
                                     </span>
                                  </div>
+                        
                               </div>                                       
                            </div>
                         </div>
@@ -253,7 +309,8 @@
                                     <span class="glyphicon glyphicon-plus"></span>
                                  </button>
                               </span>
-                           </div>                                    
+                           </div>    
+                                      
                         </div>
                      </div>
                      </accordion-group>
@@ -263,24 +320,29 @@
                <div class="row">
                   <div class="col-lg-12">
                      <hr>
-                     <accordion-group >
+                     <accordion-group is-open="fifthStatus.open">
                         <accordion-heading>
                            Default JSON format configurations
+                           <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': fifthStatus.open, 'glyphicon-chevron-right': !fifthStatus.open}"></i>
                         </accordion-heading>
 
                         <div class="col-lg-6">
                            <h4>Alca configurations:</h4>
-                           <ng-form name="fieldForm">                     
+                           <ng-form name="fieldForm">     
+                              <button class=" btn btn-success" ng-click="getAlCaMatrixValue()" tooltip="Uploads the AlCa matrix based on the given version. Might not work on some versions and return nothing" tooltip-placement="up">
+                              Get AlCa Matrix</button>                                  
                               <span class="badge badge-important" style="background-color: red" ng-if="fieldForm.$invalid">Bad JSON formatting</span>
                               <span class="badge badge-success" style="background-color: green" ng-if="!fieldForm.$invalid">Valid JSON formatting</span>
                               <inline-editable ng-model="jsons.alca" key="alca"></inline-editable>
                               
                            </ng-form>
+
                         </div>
 
                         <div class="col-lg-6">
                            <h4>Skim configurations:</h4>
-                           <ng-form name="skimFieldForm">                     
+                           <ng-form name="skimFieldForm">  
+                              <button class=" btn btn-success" ng-click="getSkimMatrixValue()" tooltip="Uploads the Skim matrix based on the given version. Might not work on some versions and return nothing" tooltip-placement="up">Get Skim Matrix</button>                                   
                               <span class="badge badge-important" style="background-color: red" ng-if="skimFieldForm.$invalid">Bad JSON formatting</span>
                               <span class="badge badge-success" style="background-color: green" ng-if="!skimFieldForm.$invalid">Valid JSON formatting</span>
                               <inline-editable ng-model="jsons.skim" key="skim"></inline-editable>
@@ -305,7 +367,7 @@
 
             <div class="row">
                <div class="col-lg-12">
-                  <h3>Main campaign info:</h3>
+                  <h3 class="title">Main campaign info:</h3>
                </div>
             </div>
 
@@ -319,7 +381,7 @@
                      <label class="sr-only" for="inputDatasetName">DSName</label>
                      <div class="input-group">
                         <div class="input-group-addon">DSName</div>
-                        <input type="text" class="form-control" id="inputDatasetName" placeholder="Name" ng-model="new_dsName">
+                        <input type="text" class="form-control" id="inputDatasetName" placeholder="Dataset name" ng-model="new_dsName">
                      </div>
 
                      <button type="submit" class="btn btn-success"  ng-click="addReq(new_dsName)">
@@ -327,6 +389,10 @@
                      </button>
                      <button type="submit" class="btn btn-danger" ng-click="removeReq(new_dsName)"> 
                         <div class="glyphicon glyphicon-minus" aria-hidden="true"></div> Remove
+                     </button>
+                    <button type="submit" class="btn btn-warning" ng-click="sendToDas()"> 
+                        <i class="fa fa-folder-o" aria-hidden="true"></i>                        
+                        Get input file
                      </button>
                   </div>
                   <hr style="border-top: 3px solid #eee">
@@ -339,6 +405,7 @@
                <accordion close-others="oneAtATime">
                   <accordion-group is-open="status.open">
                      <accordion-heading>
+                        <i class="fa fa-times fa-lg" tooltip="Input file not found or not on disk. Please input it manually" tooltip-placement="right" style="color:#d9534f" aria-hidden="true" ng-show="data['req'][name]['err']"></i>
                         {{name}}
                         <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                      </accordion-heading>
@@ -369,9 +436,10 @@
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].reco">
                               <hr>
-                              <accordion-group >
+                              <accordion-group is-open="secondStatus.open">
                                  <accordion-heading>
                                     RECO configurations:
+                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': secondStatus.open, 'glyphicon-chevron-right': !secondStatus.open}"></i>
                                  </accordion-heading>
 
                                  <div class="col-lg-4 form-horizontal">
@@ -383,8 +451,8 @@
                                                 <div class="input-group">
                                                    <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['reco'][txt]">
                                                    <span class="input-group-btn">
-                                                      <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'reco', txt, '')">
-                                                         <span class="glyphicon glyphicon-minus"></span>
+                                                      <button class="btn btn-warning btn-add" type="button" ng-click="data['req'][name]['action']['reco'][txt]=null">
+                                                         <span class="glyphicon glyphicon-remove"></span>
                                                       </button>
                                                    </span>
                                                 </div>                                                 
@@ -419,6 +487,11 @@
                                           </span>
                                        </div>                                    
                                     </div>
+                                    <div class="form-group" style="margin-top: 5px">
+                                          <button class="btn btn-success" tooltip="Adds ALCA:autoAlca[dataset] dependant on the JSON AlCa config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getAlCaDatasetValue(name, 'reco')">Add AlCa Matrix step</button>
+                                          <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'reco')">Add Skim Matrix step</button>  
+<label class="btn {{((check[name].recoUnscheduled) ? 'btn-danger' : 'btn-success')}}" tooltip="Adds/Removes --runUnscheduled parameter in the driver" tooltip-placement="up" ng-model="check[name].recoUnscheduled" ng-change="addRunUnscheduled(name, 'reco')" btn-checkbox>{{((check[name].recoUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>                                        
+                                    </div>
                                  </div>
                               </accordion-group>
 
@@ -428,9 +501,10 @@
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].skim">
                               <hr>
-                              <accordion-group >
+                              <accordion-group  is-open="thirdStatus.open">
                                  <accordion-heading>
                                     Skim configurations:
+                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': thirdStatus.open, 'glyphicon-chevron-right': !thirdStatus.open}"></i>
                                  </accordion-heading>
 
                                  <div class="col-lg-4 form-horizontal">
@@ -441,8 +515,8 @@
                                              <div class="input-group">
                                                 <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['skim'][txt]">
                                                 <span class="input-group-btn">
-                                                   <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'skim', txt, '')">
-                                                      <span class="glyphicon glyphicon-minus"></span>
+                                                   <button class="btn btn-warning btn-add" type="button" ng-click="data['req'][name]['action']['skim'][txt] = null">
+                                                      <span class="glyphicon glyphicon-remove"></span>
                                                    </button>
                                                 </span>
                                              </div>
@@ -465,6 +539,11 @@
                                           </span>
                                        </div>                                    
                                     </div>
+                                    <div class="form-group" style="margin-top: 5px">
+                                          <button class="btn btn-success" tooltip="Adds ALCA:autoAlca[dataset] dependant on the JSON AlCa config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getAlCaDatasetValue(name, 'skim')">Add AlCa Matrix step</button>
+                                          <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'skim')">Add Skim Matrix step</button>
+<label class="btn {{((check[name].skimUnscheduled) ? 'btn-danger' : 'btn-success')}}" tooltip="Adds/Removes --runUnscheduled parameter in the driver" tooltip-placement="up" ng-model="check[name].skimUnscheduled" ng-change="addRunUnscheduled(name, 'skim')" btn-checkbox>{{((check[name].skimUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>                                                 
+                                    </div>
                                  </div>
                               </accordion-group>
                            </div>
@@ -473,9 +552,10 @@
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].mini">
                               <hr>
-                              <accordion-group >
+                              <accordion-group  is-open="fourthStatus.open">
                                  <accordion-heading>
                                     MiniAOD configurations:
+                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': fourthStatus.open, 'glyphicon-chevron-right': !fourthStatus.open}"></i>
                                  </accordion-heading>
 
                                  <div class="col-lg-4 form-horizontal">
@@ -486,8 +566,8 @@
                                              <div class="input-group">
                                                 <input type="text" class="form-control" placeholder="{{txt}}" ng-model="data['req'][name]['action']['mini'][txt]">
                                                 <span class="input-group-btn">
-                                                   <button class="btn btn-danger btn-add" type="button" ng-click="removeExtra(name, 'mini', txt, '')">
-                                                      <span class="glyphicon glyphicon-minus"></span>
+                                                   <button class="btn btn-warning btn-add" type="button" ng-click="data['req'][name]['action']['mini'][txt] = null">
+                                                      <span class="glyphicon glyphicon-remove"></span>
                                                    </button>
                                                 </span>
                                              </div>
@@ -510,6 +590,11 @@
                                           </span>
                                        </div>                                    
                                     </div>
+                                    <div class="form-group" style="margin-top: 5px">
+                                       <button class="btn btn-success" tooltip="Adds ALCA:autoAlca[dataset] dependant on the JSON AlCa config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getAlCaDatasetValue(name, 'mini')">Add AlCa Matrix step</button>
+                                             <button class="btn btn-success" tooltip="Adds SKIM:autoSkim[dataset] dependant on the JSON Skim config. NOTE: make sure there is data in the default JSON config" tooltip-placement="up" ng-click="getSkimDatasetValue(name, 'mini')">Add Skim Matrix step</button>
+<label class="btn {{((check[name].miniUnscheduled) ? 'btn-danger' : 'btn-success')}}" tooltip="Adds/Removes --runUnscheduled parameter in the driver" tooltip-placement="up" ng-model="check[name].miniUnscheduled" ng-change="addRunUnscheduled(name, 'mini')" btn-checkbox>{{((check[name].miniUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>           
+                                    </div>
                                  </div>
                               </accordion-group>
                            </div>
@@ -528,8 +613,8 @@
                   Full JSON
                   <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                </accordion-heading>
-               <pre>{{data | json}}</pre>
-               <pre>{{drive | json}}</pre>
+               <pre><button class="btn btn-primary" style="float:right" ng-click="copyToClipboard(data)" tooltip="Copy to clipboard" tooltip-placement="up"><i class="fa fa-clipboard" aria-hidden="true"></i></button>{{data | json}}</pre>
+               <pre><button class="btn btn-primary" style="float:right" ng-click="copyToClipboard(drive)" tooltip="Copy to clipboard" tooltip-placement="up"><i class="fa fa-clipboard" aria-hidden="true"></i></button>{{drive | json}}</pre>
             </accordion-group>
          </accordion>         
       </div>
