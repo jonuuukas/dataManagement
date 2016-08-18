@@ -4,6 +4,7 @@
       <meta charset="utf-8"/>
       <title>App</title>
       <link rel=stylesheet type=text/css href="static/css/bootstrap.css">
+      <link rel=stylesheet type=text/css href="static/css/style.css">
       <script type=text/javascript src="static/js/angular.js"></script>
       <script type=text/javascript src="static/js/controllers.js"></script>
       <script type=text/javascript src="static/js/ui-bootstrap-tpls-0.12.1.js"></script>   
@@ -11,11 +12,13 @@
       <script src="https://use.fontawesome.com/cc110ae827.js"></script>
 
    </head>
+
    <body ng-app="myApp" ng-controller="myAppCtrl">
-      <div class="container col-lg-12" style="margin-bottom: 50px" >
+    <code>selection={{selection}}</code>
+      <div class="container col-lg-12 animate-switch-container" style="margin-bottom: 50px" ng-switch on="selection">
          <!-- Pavadinimas -->
          <div class="row">
-            <div class="col-lg-16">
+            <div class="col-lg-12">
                <h1 class="title">Data management application</h1>
             </div>
          </div>
@@ -29,7 +32,6 @@
                   <button type="submit" tooltip="Restore the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="inTheList" ng-click="loadData()">Load data <i class="fa fa-cloud-upload" aria-hidden="true"></i></button>
                   <button type="submit" tooltip="Save the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="!doc['submitted'] && inTheList" ng-click="updateDoc()">Update doc <i class="fa fa-floppy-o" aria-hidden="true"></i></button>
                   <button type="submit" tooltip="Test current datasets by running them through cmsRun" tooltip-placement="bottom" class="btn btn-warning" ng-if="!doc['submitted'] && inTheList" ng-click="testDoc()">Test Doc <i class="fa fa-info-circle" aria-hidden="true"></i></button>
-       
                   <button type="submit"  tooltip="Save the current campaign" tooltip-placement="bottom"  class="btn btn-primary" ng-if="!inTheList" ng-click="saveDoc()">Save doc <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
 
 
@@ -47,10 +49,116 @@
             </div>
 
             <!---SHIT IS REAL FROM HERE -->
+<div class="container-fluid col-lg-12" id="campTable" ng-switch-default>    
+  <table class="table table-striped col-lg-12" style="font-size:16px">
+    <thead>
+      <tr>
+        <th>Campaign Name</th>
+        <th>Actions</th>
+        <th>CMSSW</th>
+        <th>Era</th>
+        <th>Submitted</th>
+        <th>Tested</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="name in list">
+        <td class="campLink"><button ng-click="navigateAllList(name)" class="btn-link btn">{{name}}</button></td>
+        <td><button>A</button><button>B</button><button>C</button></td>
+        <td>{{additionalList[$index]['CMSSW']}}</td>
+        <td>{{additionalList[$index]['era']}}</td>
+        <td ng-show={{additionalList[$index]['submitted']}}><i class="fa fa-check" aria-hidden="true"></i></td>
+        <td ng-show={{!additionalList[$index]['submitted']}}><i class="fa fa-times" aria-hidden="true"></i></td>
+        <td ng-show={{additionalList[$index]['is_tested']}}><i class="fa fa-check" aria-hidden="true"></i></td>
+        <td ng-show={{!additionalList[$index]['is_tested']}}><i class="fa fa-times" aria-hidden="true"></i></td>
+
+      </tr>
+    </tbody>
+  </table>
+</div>
             <div class="row">
                <div class="col-lg-12 h4">
                </div>
             </div>
+        <div id = "campaignView" class="animate-switch" ng-switch-when="campaign">  
+                <ol class="breadcrumb">
+                    <li><a ng-click="backButton('campaign')">All Campaigns</a></li>
+                    <li class="active">{{data['_id']}}</li>
+                </ol>  
+<div class="row">
+               <div class="col-lg-12">
+                  <h3 class="title">Main campaign info:</h3>
+               </div>
+            </div>
+
+            <div class="row"> 
+               <div class="col-lg-12 h6"></div>
+            </div>
+
+            <div class="row">
+               <div class="col-lg-12">
+                  <div class="{{((new_dsName.charAt(0)=='/') ? 'form-group has-success' : 'form-group has-error')}}">
+                     <label class="sr-only" for="inputDatasetName">DSName</label>
+                     <div class="input-group">
+                        <div class="input-group-addon">DSName</div>
+                        <input type="text" class="form-control" id="inputDatasetName" placeholder="Dataset name" ng-model="new_dsName">
+                     </div>
+
+                     <button type="submit" class="btn btn-success"  ng-click="addReq(new_dsName)">
+                        <div class="glyphicon glyphicon-plus" aria-hidden="true"></div> Add
+                     </button>
+                     <button type="submit" class="btn btn-danger" ng-click="removeReq(new_dsName)"> 
+                        <div class="glyphicon glyphicon-minus" aria-hidden="true"></div> Remove
+                     </button>
+                    <button type="submit" class="btn btn-warning" ng-click="sendToDas()"> 
+                        <i class="fa fa-folder-o" aria-hidden="true"></i>                        
+                        Get input files
+                     </button>
+                  </div>
+                  <hr style="border-top: 3px solid #eee">
+               </div>
+            </div> 
+            <div class="row">
+               <div class="col-lg-12 h4">
+               </div>
+            </div>
+                <div class="container-fluid col-lg-12" id="dsTable">    
+                  <table class="table table-striped col-lg-12" style="font-size:16px">
+                    <thead>
+                      <tr>
+                        <th>Campaign Name</th>
+                        <th>Actions</th>
+                        <th>Test</th>
+                        <th>Reco</th>
+                        <th>Skim</th>
+                        <th>Mini</th>
+                        
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="(name, info) in data['req']">
+                        <td><buttonclass="campLink" class="btn-link btn" ng-click="navigateDetailedView()">
+                            {{name}}</button></td>
+                        <td><button>A</button><button>B</button><button>C</button></td>
+                        <td ng-show="data['req'][name]['errDas']"><i class="fa fa-times" aria-hidden="true"></i></td>
+                        <td ng-show="!data['req'][name]['errDas']"><i class="fa fa-check" aria-hidden="true"></i></td>
+                        <td ng-show="check[name]['reco']"><i class="fa fa-check" aria-hidden="true"></td>
+                        <td ng-show="!check[name]['reco']"><i class="fa fa-times" aria-hidden="true"></td>
+                        <td ng-show="check[name]['skim']"><i class="fa fa-check" aria-hidden="true"></td>
+                        <td ng-show="!check[name]['skim']"><i class="fa fa-times" aria-hidden="true"></td>
+                        <td ng-show="check[name]['mini']"><i class="fa fa-check" aria-hidden="true"></td>
+                        <td ng-show="!check[name]['mini']"><i class="fa fa-times" aria-hidden="true"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+            <div class="row">
+               <div class="col-lg-12 h4">
+               </div>
+            </div>
+
+
             <accordion close-others="false" ng-show="is_tested">
             <accordion-group is-open="status.open">
                <accordion-heading>
@@ -95,6 +203,7 @@
                <div class="col-lg-12 h4">
                </div>
             </div>
+
             <accordion close-others="false">
             <accordion-group is-open="status.open">
                <accordion-heading>
@@ -361,51 +470,25 @@
                      </accordion-group>
                   </div>
                </div>
+        </div>
 
             </accordion-group>
             </accordion>
-
-            <div class="row">
-               <div class="col-lg-12">
-                  <h3 class="title">Main campaign info:</h3>
-               </div>
-            </div>
-
-            <div class="row"> 
-               <div class="col-lg-12 h6"></div>
-            </div>
-
-            <div class="row">
-               <div class="col-lg-12">
-                  <div class="{{((new_dsName.charAt(0)=='/') ? 'form-group has-success' : 'form-group has-error')}}">
-                     <label class="sr-only" for="inputDatasetName">DSName</label>
-                     <div class="input-group">
-                        <div class="input-group-addon">DSName</div>
-                        <input type="text" class="form-control" id="inputDatasetName" placeholder="Dataset name" ng-model="new_dsName">
-                     </div>
-
-                     <button type="submit" class="btn btn-success"  ng-click="addReq(new_dsName)">
-                        <div class="glyphicon glyphicon-plus" aria-hidden="true"></div> Add
-                     </button>
-                     <button type="submit" class="btn btn-danger" ng-click="removeReq(new_dsName)"> 
-                        <div class="glyphicon glyphicon-minus" aria-hidden="true"></div> Remove
-                     </button>
-                    <button type="submit" class="btn btn-warning" ng-click="sendToDas()"> 
-                        <i class="fa fa-folder-o" aria-hidden="true"></i>                        
-                        Get input file
-                     </button>
-                  </div>
-                  <hr style="border-top: 3px solid #eee">
-               </div>
-            </div>
-
+<div id="detailedView" class="animate-switch" ng-switch-when="detailed">
+            <ol class="breadcrumb">
+                    <li><a ng-click="backButton('campaign')">All Campaigns</a></li>
+                    <li><a ng-click="backButton('detailed')">{{data['_id']}}</a></li>
+                    <li class="active">Detailed View</li>
+            </ol>
+            
             
             <div ng-repeat="(name, info) in data['req']">
 
                <accordion close-others="oneAtATime">
                   <accordion-group is-open="status.open">
                      <accordion-heading>
-                        <i class="fa fa-times fa-lg" tooltip="Input file not found or not on disk. Please input it manually" tooltip-placement="right" style="color:#d9534f" aria-hidden="true" ng-show="data['req'][name]['err']"></i>
+                        <i class="fa fa-times fa-lg" tooltip="Input file not found or not on disk. Please input it manually" tooltip-placement="right" style="color:#d9534f" aria-hidden="true" ng-show="data['req'][name]['errDas']"></i>
+
                         {{name}}
                         <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                      </accordion-heading>
@@ -618,6 +701,8 @@
             </accordion-group>
          </accordion>         
       </div>
+    </div>
+</div>
    </body>
 </html>
 

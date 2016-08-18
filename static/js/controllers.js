@@ -15,7 +15,9 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.checkAll = {reco : false, skim : false, mini :false};
   $scope.inTheList;
   $scope.list = [];
-
+  $scope.additionalList = [];
+  $scope.views = ["all","campaign","detailed"];
+  $scope.selection = $scope.views[0];
   $scope.working_on = false;
   $scope.alertMsg = {error : false, msg : "", show : false};
   $scope.is_tested = false;
@@ -165,14 +167,14 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         console.log($scope.data['req'][key]['file']);      
         if ($scope.data['req'][key]['file']=="No"){
                     $scope.alertMsg = {error : true, msg : "Failed retrieving file in DAS", show : true};   
-                    $scope.data['req'][key]['err'] = true;         
+                    $scope.data['req'][key]['errDas'] = true;         
                 }
 
         else{
                     angular.forEach($scope.data['req'][key]['action'], function (value2,key2){
                         if($scope.data['req'][key]['action'][key2] != "" && $scope.allOpt[key][key2] != undefined){
                                 $scope.data['req'][key]['action'][key2]['filein'] = data[key]['file']; 
-                                $scope.data['req'][key]['err'] = false;         
+                                $scope.data['req'][key]['errDas'] = false;         
                                 $scope.allOpt[key][key2]['filein'] = 'filein';                   
                         };                    
                     });        
@@ -489,7 +491,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   };
 
   //==============Actions with doc============//
-
+ 
   $scope.updateDoc = function()
   {
     $scope.alertMsg['show'] = false;
@@ -503,8 +505,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
               '_rev' : $scope.doc['_rev'],
               'alca' : $scope.jsons.alca,
               'lumi' : $scope.jsons.lumi,
-              'skim' : $scope.jsons.skim
-
+              'skim' : $scope.jsons.skim,
+              'is_tested' : $scope.is_tested
             }
     }).success(function(data, status){
       $scope.loadData();
@@ -583,11 +585,11 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       method: 'GET', 
       url:'get_all_docs', 
     }).success(function(data, status){
-      var tmp = JSON.parse(JSON.stringify(data['rows']));
-      for(var i = 0; i < tmp.length; i++){
-        var iteratee = tmp[i];
-        $scope.list.push(iteratee['id']); 
-      }
+      console.log(angular.toJson(data));
+      angular.forEach(data, function (value, key){
+        $scope.list.push(key);//did this to not mess up existing code. yes i know - not efficient, but more efficient than rewriting everything 
+        $scope.additionalList.push(value);
+    });
       console.log("Success. Got all docs");
     }).error(function(status){
       console.log("Error while getting docs:" + status);
@@ -612,7 +614,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
               'lumi' : $scope.jsons.lumi,
               'skim' : $scope.jsons.skim,
               'defaults' : $scope.defCon,
-              'submitted' : false
+              'submitted' : false,
+              'is_tested' : false
             }
     }).success(function(data, status){
       $scope.alertMsg = {error : false, msg : "Action was successful.", show : true};
@@ -668,7 +671,25 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       console.log("Error while loading:" + status);
     }); 
   };
-
+///====Navigates to the dataset view of a campaign====////
+ $scope.navigateDetailedView = function(){
+    $scope.selection = "detailed";
+}
+///====Used for campaign list on links/campaignnames, changes and switches corresponding divs====///
+ $scope.navigateAllList = function(nameVal){
+    $scope.data['_id'] = nameVal;
+    $scope.selection = "campaign";
+    $scope.loadData();
+    };
+///====Used to navigate a div back =====////
+ $scope.backButton = function(backVal){
+    if (backVal == "campaign"){
+        $scope.selection = "all";    
+    }
+    if (backVal == "detailed"){
+        $scope.selection = "campaign";    
+    }
+}
   $scope.submitCampaign = function()
   {
     $scope.alertMsg['show'] = false;
