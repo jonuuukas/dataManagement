@@ -74,7 +74,21 @@ def get_all_docs():
     object to be pushed in to the data list
     """
     info = couch.get_all_docs()
-    return json.dumps(info)
+    fullInfo = {}
+    for rows in info['rows']:
+        x = couch.get_file(rows['id'])
+        name = x['data']['_id']
+        fullInfo[name] = {}
+        try:
+            fullInfo[name]['era'] = x['data']['era']
+            fullInfo[name]['CMSSW'] = x['data']['CMSSW']
+            fullInfo[name]['submitted'] = x['submitted']
+
+            fullInfo[name]['is_tested'] = x['is_tested']
+
+        except:
+            fullInfo[name]['is_tested'] = False
+    return json.dumps(fullInfo)
 
 @app.route('/update_file', methods=["POST"])
 def update_file():
@@ -87,6 +101,7 @@ def update_file():
     data['doc']['alca'] = data['alca']
     data['doc']['skim'] = data['skim']
     data['doc']['lumi'] = data['lumi']
+    data['doc']['is_tested'] = data['is_tested']
     doc = json.dumps(data['doc'])
     doc_data = couch.update_file(_id, doc, _rev)
     return json.dumps(doc_data)
