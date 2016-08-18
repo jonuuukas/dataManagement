@@ -1,0 +1,2 @@
+.breadcrumb li {font-size: 30px;}
+.breadcrumb>li+li:before {content: "\2771\00a0";}

@@ -3392,7 +3392,7 @@ fieldset[disabled] .btn-danger.focus {
   background-color: #ffffff;
 }
 .btn-link {
-  color: #df691a;
+
   font-weight: normal;
   border-radius: 0;
 }
@@ -4681,6 +4681,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
   list-style: none;
   background-color: #4e5d6c;
   border-radius: 0;
+  
 }
 .breadcrumb > li {
   display: inline-block;
