@@ -65,7 +65,8 @@
         <td><button class="btn btn-link" tooltip="Edit Campaign" tooltip-placement="up" ng-click="navigateAllList(name)"><i class="fa fa-pencil" aria-hidden="true"></i>
 </button>
         <button class="btn btn-link" tooltip="Test Campaign" tooltip-placement="up" ng-click="allViewTest(name)"><i class="fa fa-wrench" aria-hidden="true"></i></button>
-        <button class="{{((additionalList[$index]['submitted']) ? 'btn btn-link disabled' : 'btn btn-link active')}}"  tooltip="Submit Campaign" tooltip-placement="up" ng-click="allViewSubmit(name)"><i class="fa fa-font-awesome" aria-hidden="true"></i></button></td>
+        <button class="{{((additionalList[$index]['submitted']) ? 'btn btn-link disabled' : 'btn btn-link active')}}"  tooltip="Submit Campaign" tooltip-placement="up" ng-click="allViewSubmit(name)"><i class="fa fa-font-awesome" aria-hidden="true"></i></button>
+        <button class="btn btn-link" tooltip="Delete Campaign" tooltip-placement="up" ng-click="allViewDelete(name)"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
         <td>{{additionalList[$index]['CMSSW']}}</td>
         <td>{{additionalList[$index]['era']}}</td>
         <td><i class="{{((additionalList[$index]['submitted']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></i></td>
@@ -427,6 +428,16 @@
                   </div>
                </div>
         </div>
+
+            </accordion-group>
+            </accordion>
+            
+<div id="detailedView" class="animate-switch" ng-switch-when="detailed">
+            <ol class="breadcrumb">
+                    <li><a ng-click="backButton('campaign')">All Campaigns</a></li>
+                    <li><a ng-click="backButton('detailed')">{{data['_id']}}</a></li>
+                    <li class="active">{{currentDs}}</li>
+            </ol>
             <accordion close-others="false" ng-show="is_tested">
             <accordion-group is-open="status.open">
                <accordion-heading>
@@ -466,15 +477,6 @@
 
             </accordion-group>
             </accordion>
-            </accordion-group>
-            </accordion>
-<div id="detailedView" class="animate-switch" ng-switch-when="detailed">
-            <ol class="breadcrumb">
-                    <li><a ng-click="backButton('campaign')">All Campaigns</a></li>
-                    <li><a ng-click="backButton('detailed')">{{data['_id']}}</a></li>
-                    <li class="active">{{currentDs}}</li>
-            </ol>
-            
             
             <div ng-repeat="(name, info) in data['req']" ng-show="name==currentDs">
                     <h2>{{name}}</h2>

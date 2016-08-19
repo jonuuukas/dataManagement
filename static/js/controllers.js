@@ -582,6 +582,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   };
   $scope.getAllDocs = function()
   {
+    $scope.list = [];
+    $scope.additionalList = [];
     $http({
       method: 'GET', 
       url:'get_all_docs', 
@@ -631,7 +633,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       console.log("Error while saving the doc:" + status);
     });  
   };
-
+///====Loads document from the couchDB and updates the frontend to store it's received data====///
   $scope.loadData = function()
   {
     console.log("id: " + $scope.data['_id']);
@@ -643,8 +645,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
                     '_id': $scope.data['_id']
                   }
           }).success(function(data, status){
-      $scope.doc = data
-      
+      $scope.doc = data;
       $scope.drive = $scope.doc['drive'];      
       $scope.jsons.skim = $scope.doc['skim'];
       $scope.jsons.alca = $scope.doc['alca'];
@@ -672,7 +673,30 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       console.log("Error while loading:" + status);
     }); 
   };
-
+///====Creates a request to delete the data by given _id of the file====///
+  $scope.deleteData = function()
+    {
+      var tempStr = $scope.data['_id'];
+      $http({
+            method: 'DELETE', 
+            url:'delete_doc', 
+            data: {
+                    '_id': $scope.data['_id']
+                  }
+          }).success(function(data, status){    
+              if(data=="success"){
+                $scope.alertMsg = {error : false, msg : "Successfully deleted campaign " + tempStr + ".", show : true};                
+                } 
+              else if (data=="error"){
+                $scope.alertMsg = {error : true, msg : "Wasn't able to delete " + tempStr + ".", show : true};
+                } 
+              $scope.getAllDocs();
+              $scope.data['_id'] = "CampaignName";
+        }).error(function(data, status){
+                $scope.alertMsg = {error : true, msg : "Wasn't able to delete " + tempStr + ".", show : true};
+            });
+        delete tempStr;
+    };
 ///////////////////////////////////////
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -714,6 +738,12 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.data['_id'] = nameVal;
         $scope.loadData();
         $scope.testDoc();
+    }
+  $scope.allViewDelete = function(nameVal)
+    {
+        $scope.data['_id'] = nameVal;   
+        $scope.deleteData();
+       // $scope.getAllDocs();
     }
   $scope.submitCampaign = function()
   {

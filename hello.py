@@ -67,14 +67,34 @@ def load_data():
     doc_data = couch.get_file(_id)
     return json.dumps(doc_data)
 
+@app.route('/delete_doc', methods=["DELETE"])
+def delete_data():
+    """
+    Sends a request to couchDB to delete the given document
+    according to the _id var of the record
+    """
+    data = json.loads(request.get_data())
+    print data
+    _id = data['_id']
+    _rev = couch.get_file(_id)['_rev']
+
+    try:
+        doc_data = couch.delete_file(_id, _rev)
+        
+        return "success"
+    except:
+        return "error"
+
 @app.route('/get_all_docs', methods=["GET"])
 def get_all_docs():
     """
     Used in saveDocs() function to get all docs and later for the 
     object to be pushed in to the data list
     """
+    info = {}
     info = couch.get_all_docs()
     fullInfo = {}
+    x = {}
     for rows in info['rows']:
         x = couch.get_file(rows['id'])
         name = x['data']['_id']
