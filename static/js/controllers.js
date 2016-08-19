@@ -18,6 +18,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.additionalList = [];
   $scope.views = ["all","campaign","detailed"];
   $scope.selection = $scope.views[0];
+  $scope.currentDs = "";
   $scope.working_on = false;
   $scope.alertMsg = {error : false, msg : "", show : false};
   $scope.is_tested = false;
@@ -672,8 +673,9 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     }); 
   };
 ///====Navigates to the dataset view of a campaign====////
- $scope.navigateDetailedView = function(){
+ $scope.navigateDetailedView = function(nameVal){
     $scope.selection = "detailed";
+    $scope.currentDs = nameVal;
 }
 ///====Used for campaign list on links/campaignnames, changes and switches corresponding divs====///
  $scope.navigateAllList = function(nameVal){
