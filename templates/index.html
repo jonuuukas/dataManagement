@@ -14,7 +14,6 @@
    </head>
 
    <body ng-app="myApp" ng-controller="myAppCtrl">
-    <code>selection={{selection}}</code>
       <div class="container col-lg-12 animate-switch-container" style="margin-bottom: 50px" ng-switch on="selection">
          <!-- Pavadinimas -->
          <div class="row">
@@ -84,7 +83,46 @@
                 <ol class="breadcrumb">
                     <li><a ng-click="backButton('campaign')">All Campaigns</a></li>
                     <li class="active">{{data['_id']}}</li>
-                </ol>  
+                </ol>   
+            <div class="row">
+               <div class="col-lg-12 h4">
+               </div>
+            </div>
+                <div class="container-fluid col-lg-12" id="dsTable">    
+                  <table class="table table-striped col-lg-12" style="font-size:16px">
+                    <thead>
+                      <tr>
+                        <th>Campaign Name</th>
+                        <th>Actions</th>
+                        <th>Test</th>
+                        <th>Reco</th>
+                        <th>Skim</th>
+                        <th>Mini</th>
+                        
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="(name, info) in data['req']">
+                        <td><buttonclass="campLink" class="btn-link btn" ng-click="navigateDetailedView(name)">
+                            {{name}}</button></td>
+                        <td><button>A</button><button>B</button><button>C</button></td>
+                        <td ng-show="data['req'][name]['errDas']"><i class="fa fa-times" aria-hidden="true"></i></td>
+                        <td ng-show="!data['req'][name]['errDas']"><i class="fa fa-check" aria-hidden="true"></i></td>
+                        <td ng-show="check[name]['reco']"><i class="fa fa-check" aria-hidden="true"></td>
+                        <td ng-show="!check[name]['reco']"><i class="fa fa-times" aria-hidden="true"></td>
+                        <td ng-show="check[name]['skim']"><i class="fa fa-check" aria-hidden="true"></td>
+                        <td ng-show="!check[name]['skim']"><i class="fa fa-times" aria-hidden="true"></td>
+                        <td ng-show="check[name]['mini']"><i class="fa fa-check" aria-hidden="true"></td>
+                        <td ng-show="!check[name]['mini']"><i class="fa fa-times" aria-hidden="true"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+            <div class="row">
+               <div class="col-lg-12 h4">
+               </div>
+            </div>
 <div class="row">
                <div class="col-lg-12">
                   <h3 class="title">Main campaign info:</h3>
@@ -117,47 +155,7 @@
                   </div>
                   <hr style="border-top: 3px solid #eee">
                </div>
-            </div> 
-            <div class="row">
-               <div class="col-lg-12 h4">
-               </div>
             </div>
-                <div class="container-fluid col-lg-12" id="dsTable">    
-                  <table class="table table-striped col-lg-12" style="font-size:16px">
-                    <thead>
-                      <tr>
-                        <th>Campaign Name</th>
-                        <th>Actions</th>
-                        <th>Test</th>
-                        <th>Reco</th>
-                        <th>Skim</th>
-                        <th>Mini</th>
-                        
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr ng-repeat="(name, info) in data['req']">
-                        <td><buttonclass="campLink" class="btn-link btn" ng-click="navigateDetailedView()">
-                            {{name}}</button></td>
-                        <td><button>A</button><button>B</button><button>C</button></td>
-                        <td ng-show="data['req'][name]['errDas']"><i class="fa fa-times" aria-hidden="true"></i></td>
-                        <td ng-show="!data['req'][name]['errDas']"><i class="fa fa-check" aria-hidden="true"></i></td>
-                        <td ng-show="check[name]['reco']"><i class="fa fa-check" aria-hidden="true"></td>
-                        <td ng-show="!check[name]['reco']"><i class="fa fa-times" aria-hidden="true"></td>
-                        <td ng-show="check[name]['skim']"><i class="fa fa-check" aria-hidden="true"></td>
-                        <td ng-show="!check[name]['skim']"><i class="fa fa-times" aria-hidden="true"></td>
-                        <td ng-show="check[name]['mini']"><i class="fa fa-check" aria-hidden="true"></td>
-                        <td ng-show="!check[name]['mini']"><i class="fa fa-times" aria-hidden="true"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-            <div class="row">
-               <div class="col-lg-12 h4">
-               </div>
-            </div>
-
 
             <accordion close-others="false" ng-show="is_tested">
             <accordion-group is-open="status.open">
@@ -478,24 +476,14 @@
             <ol class="breadcrumb">
                     <li><a ng-click="backButton('campaign')">All Campaigns</a></li>
                     <li><a ng-click="backButton('detailed')">{{data['_id']}}</a></li>
-                    <li class="active">Detailed View</li>
+                    <li class="active">{{currentDs}}</li>
             </ol>
             
             
-            <div ng-repeat="(name, info) in data['req']">
-
-               <accordion close-others="oneAtATime">
-                  <accordion-group is-open="status.open">
-                     <accordion-heading>
-                        <i class="fa fa-times fa-lg" tooltip="Input file not found or not on disk. Please input it manually" tooltip-placement="right" style="color:#d9534f" aria-hidden="true" ng-show="data['req'][name]['errDas']"></i>
-
-                        {{name}}
-                        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                     </accordion-heading>
-
+            <div ng-repeat="(name, info) in data['req']" ng-show="name==currentDs">
+                    <h2>{{name}}</h2>
                      <div class="row">
                         <div class="col-md-12 h4">
-                        
                            Add/Delete steps: 
                            <div class="btn-group">
                               <label class="btn {{((check[name].reco) ? 'btn-danger' : 'btn-success')}}" ng-model="check[name].reco" ng-change="checkChange(name, 'reco')" btn-checkbox>{{((check[name].reco) ? 'Delete Reco' : 'Add Reco')}}</label>
@@ -512,19 +500,12 @@
                            </div> 
                         </div>
                      </div>
-
-                       
+                     
                      <ng-form name="fieldForm">
-
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].reco">
                               <hr>
-                              <accordion-group is-open="secondStatus.open">
-                                 <accordion-heading>
-                                    RECO configurations:
-                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': secondStatus.open, 'glyphicon-chevron-right': !secondStatus.open}"></i>
-                                 </accordion-heading>
-
+                                <h3>RECO configurations:</h3>
                                  <div class="col-lg-4 form-horizontal">
                                     <div class="form-inline">
                                        <div ng-repeat="(id, txt) in allOpt[name]['reco']"> <!--recoOpt-->
@@ -576,20 +557,13 @@
 <label class="btn {{((check[name].recoUnscheduled) ? 'btn-danger' : 'btn-success')}}" tooltip="Adds/Removes --runUnscheduled parameter in the driver" tooltip-placement="up" ng-model="check[name].recoUnscheduled" ng-change="addRunUnscheduled(name, 'reco')" btn-checkbox>{{((check[name].recoUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>                                        
                                     </div>
                                  </div>
-                              </accordion-group>
-
                            </div>
                         </div>
 
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].skim">
                               <hr>
-                              <accordion-group  is-open="thirdStatus.open">
-                                 <accordion-heading>
-                                    Skim configurations:
-                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': thirdStatus.open, 'glyphicon-chevron-right': !thirdStatus.open}"></i>
-                                 </accordion-heading>
-
+                                 <h3>Skim configurations:</h3>
                                  <div class="col-lg-4 form-horizontal">
                                     <div ng-repeat="(id, txt) in allOpt[name]['skim']">
                                        <div class="form-group" style="margin-top: 5px">                     
@@ -607,7 +581,6 @@
                                        </div>
                                     </div>
                                  </div>
-
                                  <div class="col-lg-8">                       
                                     <pre style="margin-top: 5px">{{drive[name]['skim']}}</pre>
                                     <div class="form-group" style="margin-top: 5px">
@@ -628,19 +601,12 @@
 <label class="btn {{((check[name].skimUnscheduled) ? 'btn-danger' : 'btn-success')}}" tooltip="Adds/Removes --runUnscheduled parameter in the driver" tooltip-placement="up" ng-model="check[name].skimUnscheduled" ng-change="addRunUnscheduled(name, 'skim')" btn-checkbox>{{((check[name].skimUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>                                                 
                                     </div>
                                  </div>
-                              </accordion-group>
                            </div>
                         </div>
-
                         <div class="row">
                            <div class="col-lg-12" ng-show="check[name].mini">
                               <hr>
-                              <accordion-group  is-open="fourthStatus.open">
-                                 <accordion-heading>
-                                    MiniAOD configurations:
-                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': fourthStatus.open, 'glyphicon-chevron-right': !fourthStatus.open}"></i>
-                                 </accordion-heading>
-
+                                 <h3>MiniAOD configurations:</h3>
                                  <div class="col-lg-4 form-horizontal">
                                     <div ng-repeat="(id, txt) in allOpt[name]['mini']">
                                        <div class="form-group" style="margin-top: 5px">                     
@@ -679,17 +645,13 @@
 <label class="btn {{((check[name].miniUnscheduled) ? 'btn-danger' : 'btn-success')}}" tooltip="Adds/Removes --runUnscheduled parameter in the driver" tooltip-placement="up" ng-model="check[name].miniUnscheduled" ng-change="addRunUnscheduled(name, 'mini')" btn-checkbox>{{((check[name].miniUnscheduled) ? 'Delete runUnscheduled' : 'Add runUnscheduled')}}</label>           
                                     </div>
                                  </div>
-                              </accordion-group>
                            </div>
                         </div>
-
                      </ng-form>
-                  </accordion-group>
-               </accordion>
             </div>
          </form>
-
-         <div class="row"></div>
+        
+         <div class="row"><hr></div>
          <accordion close-others="oneAtATime">
             <accordion-group is-open="status.open">
                <accordion-heading>
