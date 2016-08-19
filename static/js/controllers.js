@@ -511,10 +511,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
             }
     }).success(function(data, status){
       $scope.loadData();
-      $scope.alertMsg = {error : false, msg : "Action was successful.", show : true};     
+      $scope.alertMsg = {error : false, msg : "Action was successful for " + $scope.data['_id']+ ".", show : true};     
       console.log("Success updating the doc: " + data + " " + status);
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
+      $scope.alertMsg = {error : true, msg : "Action was unsuccessful for " + $scope.data['_id']+ ".", show : true};
       console.log("Error while updating the doc: " + status);
     }); 
   };
@@ -560,10 +560,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.alertMsg = {error : true, msg : "Test was unsuccessful. Scram version was not found for this CMSSW version", show : true};
       }
       else if (data['flag'] == "Fatality"){
-        $scope.alertMsg = {error : true, msg : "Fatal exception was found. See Test Output", show : true};
+        $scope.alertMsg = {error : true, msg : "Fatal exception was found for " + $scope.data['_id']+ ". See Test Output", show : true};
       }
       else{
-      $scope.alertMsg = {error:false, msg: "No fatal errors. See Test Output to be sure", show : true};
+      $scope.alertMsg = {error:false, msg: "No fatal errors for " + $scope.data['_id']+ ". See Test Output to be sure", show : true};
     }
     $scope.working_on = false;
     angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
@@ -571,12 +571,12 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       $scope.data['req'][key]['stdout'] = data[key]['stdout'];
 
       console.log($scope.data['req'][key]['stderr']);
-      console.log("Test run succeeded, check Test Output for results")
+      console.log("Test run succeeded for " + $scope.data['_id']+ ", check Test Output for results")
     });
     }).error(function(status){
       $scope.alertMsg = {error: true, msg : "Test failed, check the logs", show : true};
       $scope.working_on = false;
-      console.log("Error while running the test: " + status);
+      console.log("Error while running the test for " + $scope.data['_id']+ ": " + status);
     });
 
   };
@@ -619,14 +619,14 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
               'is_tested' : false
             }
     }).success(function(data, status){
-      $scope.alertMsg = {error : false, msg : "Action was successful.", show : true};
+      $scope.alertMsg = {error : false, msg : "Action was successful for " + $scope.data['_id']+ ".", show : true};
       $scope.working_on = false;
       $scope.loadData();
       $scope.getAllDocs();
       $scope.inTheList = true;
       console.log("Success while saving the doc" + data + " " + status);
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Action was unsuccessful.", show : true};
+      $scope.alertMsg = {error : true, msg : "Action was unsuccessful for " + $scope.data['_id']+ ".", show : true};
       $scope.working_on = false;      
       console.log("Error while saving the doc:" + status);
     });  
@@ -666,12 +666,21 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         }
       }
       $scope.checkTests();
-      $scope.alertMsg = {error : false, msg : "Loading was successful.", show : true};
+      $scope.alertMsg = {error : false, msg : "Loading was successful for " + $scope.data['_id']+ ".", show : true};
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Loading was unsuccessful.", show : true};
+      $scope.alertMsg = {error : true, msg : "Loading was unsuccessful for " + $scope.data['_id']+ ".", show : true};
       console.log("Error while loading:" + status);
     }); 
   };
+
+///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
+////////////Button functions for new UI
+///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
+
 ///====Navigates to the dataset view of a campaign====////
  $scope.navigateDetailedView = function(nameVal){
     $scope.selection = "detailed";
@@ -685,13 +694,27 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     };
 ///====Used to navigate a div back =====////
  $scope.backButton = function(backVal){
-    if (backVal == "campaign"){
-        $scope.selection = "all";    
+        if (backVal == "campaign"){
+            $scope.selection = "all";    
+        }
+        if (backVal == "detailed"){
+            $scope.selection = "campaign";    
+        }
     }
-    if (backVal == "detailed"){
-        $scope.selection = "campaign";    
+///====submit button in campaign list function which loads and execs submit====///
+  $scope.allViewSubmit = function (nameVal)
+    {
+        $scope.data['_id'] = nameVal;
+        $scope.loadData();
+        $scope.submitCampaign();
     }
-}
+///===test button in campaign list loads and tests the campaign====///
+  $scope.allViewTest = function (nameVal)
+    {
+        $scope.data['_id'] = nameVal;
+        $scope.loadData();
+        $scope.testDoc();
+    }
   $scope.submitCampaign = function()
   {
     $scope.alertMsg['show'] = false;
@@ -709,17 +732,17 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       }).success(function(data, status){
       $scope.working_on = false;
       if (data == '0'){
-        $scope.alertMsg = {error : false, msg : "Submit was successful.", show : true};
+        $scope.alertMsg = {error : false, msg : "Submit was successful for " + $scope.data['_id']+ ".", show : true};
         console.log("Complete success! " + data + " status: " + status);
       } else if (data == 'No scram'){
-        $scope.alertMsg = {error : true, msg : "Submit was unsuccessful. Scram version was not found for this CMSSW version", show : true};
+        $scope.alertMsg = {error : true, msg : "Submit was unsuccessful for " + $scope.data['_id']+ ". Scram version was not found for this CMSSW version", show : true};
         $scope.doc['submitted'] = false;
       } else {
-        $scope.alertMsg = {error : true, msg : "Submit was unsuccessful. Something went wrong, better check the logs!", show : true};
+        $scope.alertMsg = {error : true, msg : "Submit was unsuccessful for " + $scope.data['_id']+ ". Something went wrong, better check the logs!", show : true};
         console.log("Submit went wrong:" + data +" status: " + status);
       }
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Submitting was unsuccessful", show : true};
+      $scope.alertMsg = {error : true, msg : "Submitting was unsuccessful for " + $scope.data['_id'], show : true};
       $scope.working_on = false;
       console.log("Submit error: " + status);
     });
@@ -789,7 +812,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     dsValue = nameVal.substring(1,slashIndex);
     matrixVal = $scope.jsons.alca;
     if(matrixVal[dsValue] == undefined){
-      $scope.alertMsg = {error : true, msg : "Check if the AlCa matrix is not empty and if there is the Dataset value!", show : true};
+      $scope.alertMsg = {error : true, msg : "Check if the AlCa matrix is not empty and if there is the Dataset value for " + $scope.data['_id']+ "!", show : true};
     }
     else{
       console.log(matrixVal[dsValue]);
@@ -815,7 +838,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     dsValue = nameVal.substring(1,slashIndex);
     matrixVal = $scope.jsons.skim;
     if(matrixVal[dsValue] == undefined){
-      $scope.alertMsg = {error : true, msg : "Check if the Skim matrix is not empty and if there is the Dataset value!", show : true};
+      $scope.alertMsg = {error : true, msg : "Check if the Skim matrix is not empty and if there is the Dataset value for " + $scope.data['_id']+ "!", show : true};
     }
     else{
       if($scope.data['req'][nameVal]['action'][type]['steps'] == undefined){ //just checkin if comma is needed and also avoiding 'undefined' string added to the steps
@@ -924,7 +947,6 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     }
     
   },true);
-
   //==============Prepare data================//
   $scope.getAllDocs();
 

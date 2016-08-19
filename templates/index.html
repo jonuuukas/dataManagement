@@ -35,8 +35,7 @@
 
 
                   <button type="submit" tooltip="WARNING: You can only submit the campaign once. Any changes will have to be saved to another campaign" tooltip-placement="bottom" class="btn btn-danger" ng-if="!doc['submitted'] && inTheList" ng-click="submitCampaign()">Submit campaign <i class="fa fa-sign-out" aria-hidden="true"></i></button> 
-
-                  <img ng-show="working_on" ng-src="https://twiki.cern.ch/twiki/pub/TWiki/TWikiDocGraphics/processing-bg.gif" src="https://twiki.cern.ch/twiki/pub/TWiki/TWikiDocGraphics/processing-bg.gif" class="ng-hide">
+                    <i ng-show="working_on" class="fa fa-circle-o-notch fa-spin fa-2x fa-fw ng-hide"></i><span class="sr-only">Loading...</span>
                   
                   <span class="{{((alertMsg['error']) ? 'alert alert-danger' : 'alert alert-success')}}" role="alert" ng-if="alertMsg['show']">
                      <span class="{{((alertMsg['error']) ? 'glyphicon glyphicon-warning-sign' : 'glyphicon glyphicon-ok-sign')}}" aria-hidden="true"></span>
@@ -63,14 +62,14 @@
     <tbody>
       <tr ng-repeat="name in list">
         <td class="campLink"><button ng-click="navigateAllList(name)" class="btn-link btn">{{name}}</button></td>
-        <td><button>A</button><button>B</button><button>C</button></td>
+        <td><button class="btn btn-link" tooltip="Edit Campaign" tooltip-placement="up" ng-click="navigateAllList(name)"><i class="fa fa-pencil" aria-hidden="true"></i>
+</button>
+        <button class="btn btn-link" tooltip="Test Campaign" tooltip-placement="up" ng-click="allViewTest(name)"><i class="fa fa-wrench" aria-hidden="true"></i></button>
+        <button class="{{((additionalList[$index]['submitted']) ? 'btn btn-link disabled' : 'btn btn-link active')}}"  tooltip="Submit Campaign" tooltip-placement="up" ng-click="allViewSubmit(name)"><i class="fa fa-font-awesome" aria-hidden="true"></i></button></td>
         <td>{{additionalList[$index]['CMSSW']}}</td>
         <td>{{additionalList[$index]['era']}}</td>
-        <td ng-show={{additionalList[$index]['submitted']}}><i class="fa fa-check" aria-hidden="true"></i></td>
-        <td ng-show={{!additionalList[$index]['submitted']}}><i class="fa fa-times" aria-hidden="true"></i></td>
-        <td ng-show={{additionalList[$index]['is_tested']}}><i class="fa fa-check" aria-hidden="true"></i></td>
-        <td ng-show={{!additionalList[$index]['is_tested']}}><i class="fa fa-times" aria-hidden="true"></i></td>
-
+        <td><i class="{{((additionalList[$index]['submitted']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></i></td>
+        <td><i class="{{((additionalList[$index]['is_tested']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></i></td>
       </tr>
     </tbody>
   </table>
@@ -85,45 +84,6 @@
                     <li class="active">{{data['_id']}}</li>
                 </ol>   
             <div class="row">
-               <div class="col-lg-12 h4">
-               </div>
-            </div>
-                <div class="container-fluid col-lg-12" id="dsTable">    
-                  <table class="table table-striped col-lg-12" style="font-size:16px">
-                    <thead>
-                      <tr>
-                        <th>Campaign Name</th>
-                        <th>Actions</th>
-                        <th>Test</th>
-                        <th>Reco</th>
-                        <th>Skim</th>
-                        <th>Mini</th>
-                        
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr ng-repeat="(name, info) in data['req']">
-                        <td><buttonclass="campLink" class="btn-link btn" ng-click="navigateDetailedView(name)">
-                            {{name}}</button></td>
-                        <td><button>A</button><button>B</button><button>C</button></td>
-                        <td ng-show="data['req'][name]['errDas']"><i class="fa fa-times" aria-hidden="true"></i></td>
-                        <td ng-show="!data['req'][name]['errDas']"><i class="fa fa-check" aria-hidden="true"></i></td>
-                        <td ng-show="check[name]['reco']"><i class="fa fa-check" aria-hidden="true"></td>
-                        <td ng-show="!check[name]['reco']"><i class="fa fa-times" aria-hidden="true"></td>
-                        <td ng-show="check[name]['skim']"><i class="fa fa-check" aria-hidden="true"></td>
-                        <td ng-show="!check[name]['skim']"><i class="fa fa-times" aria-hidden="true"></td>
-                        <td ng-show="check[name]['mini']"><i class="fa fa-check" aria-hidden="true"></td>
-                        <td ng-show="!check[name]['mini']"><i class="fa fa-times" aria-hidden="true"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-            <div class="row">
-               <div class="col-lg-12 h4">
-               </div>
-            </div>
-<div class="row">
                <div class="col-lg-12">
                   <h3 class="title">Main campaign info:</h3>
                </div>
@@ -157,45 +117,43 @@
                </div>
             </div>
 
-            <accordion close-others="false" ng-show="is_tested">
-            <accordion-group is-open="status.open">
-               <accordion-heading>
-                  Test Output
-                  <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                  </accordion-heading>
-                     <div class="row" ng-repeat="(name, info) in data['req']">
-                     <div class='col-lg-12'>
-                     <accordion close-others="oneAtATime">
-                        <accordion-group is-open="secondStatus.open">
-                           
-                                       <accordion-heading>
-                                       {{name}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': secondStatus.open, 'glyphicon-chevron-right': !secondStatus.open}"></i>
-                                       </accordion-heading>
-                                          <div class ="col-lg-12">
-                                          <ul class="nav nav-tabs">
-                                           <li ng-click="item=1"><a data-toggle="tab">StdErr</a>  </li>
-                                           <li ng-click="item=2"> <a data-toggle="tab"> StdOut</a></li>
-                                          </ul>
-                                 
-                                               <div class="tab-content" ng-init='item=1'>
-                                                    <div ng-show='item == 1'>
-                                                      <h3>StdErr</h3>
-                                                      <pre id="testOutput" style="margin-top: 5px">{{info['stderr']}}</pre>
-                                                   </div>
-                                                   <div ng-show='item == 2'>
-                                                      <h3>StdOut</h3>
-                                                      <pre id="testOutput" style="margin-top: 5px">{{info['stdout']}}</pre>
-                                                   </div>
-                                                </div>
+            <div class="row">
+               <div class="col-lg-12 h4">
+               </div>
+            </div>
+                <div class="container-fluid col-lg-12" id="dsTable">    
+                  <table class="table table-striped col-lg-12" style="font-size:16px">
+                    <thead>
+                      <tr>
+                        <th>Campaign Name</th>
+                        <th>Actions</th>
+                        <th>Test</th>
+                        <th>Reco</th>
+                        <th>Skim</th>
+                        <th>Mini</th>
+                        
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="(name, info) in data['req']">
+                        <td><buttonclass="campLink" class="btn-link btn" ng-click="navigateDetailedView(name)">
+                            {{name}}</button></td>
+                        <td><button>A</button><button>B</button><button>C</button></td>
+                        <td><i class="{{((data['req'][name]['errDas']) ? 'fa fa-times' : 'fa fa-check')}}" aria-hidden="true"></i></td>
+                        <td><i class="{{((check[name]['reco']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></td>
+                        <td><i class="{{((check[name]['skim']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></td>
+                        <td><i class="{{((check[name]['mini']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
 
-                                          </div>
-                        </accordion-group>
-                     </accordion>
-                     </div>
-                     </div>
+            <div class="row">
+               <div class="col-lg-12 h4">
+               </div>
+            </div>
 
-            </accordion-group>
-            </accordion>
+
             <!---TO HERE -->
             <div class="row">
                <div class="col-lg-12 h4">
@@ -203,7 +161,7 @@
             </div>
 
             <accordion close-others="false">
-            <accordion-group is-open="status.open">
+            <accordion-group is-open="status.open" ng-init="status.open = true">
                <accordion-heading>
                   Default Configurations
                   <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
@@ -469,7 +427,45 @@
                   </div>
                </div>
         </div>
+            <accordion close-others="false" ng-show="is_tested">
+            <accordion-group is-open="status.open">
+               <accordion-heading>
+                  Test Output
+                  <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                  </accordion-heading>
+                     <div class="row" ng-repeat="(name, info) in data['req']">
+                     <div class='col-lg-12'>
+                     <accordion close-others="oneAtATime">
+                        <accordion-group is-open="secondStatus.open">
+                           
+                                       <accordion-heading>
+                                       {{name}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': secondStatus.open, 'glyphicon-chevron-right': !secondStatus.open}"></i>
+                                       </accordion-heading>
+                                          <div class ="col-lg-12">
+                                          <ul class="nav nav-tabs">
+                                           <li ng-click="item=1"><a data-toggle="tab">StdErr</a>  </li>
+                                           <li ng-click="item=2"> <a data-toggle="tab"> StdOut</a></li>
+                                          </ul>
+                                 
+                                               <div class="tab-content" ng-init='item=1'>
+                                                    <div ng-show='item == 1'>
+                                                      <h3>StdErr</h3>
+                                                      <pre id="testOutput" style="margin-top: 5px">{{info['stderr']}}</pre>
+                                                   </div>
+                                                   <div ng-show='item == 2'>
+                                                      <h3>StdOut</h3>
+                                                      <pre id="testOutput" style="margin-top: 5px">{{info['stdout']}}</pre>
+                                                   </div>
+                                                </div>
 
+                                          </div>
+                        </accordion-group>
+                     </accordion>
+                     </div>
+                     </div>
+
+            </accordion-group>
+            </accordion>
             </accordion-group>
             </accordion>
 <div id="detailedView" class="animate-switch" ng-switch-when="detailed">
