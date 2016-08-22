@@ -74,13 +74,11 @@ def delete_data():
     according to the _id var of the record
     """
     data = json.loads(request.get_data())
-    print data
     _id = data['_id']
     _rev = couch.get_file(_id)['_rev']
-
     try:
         doc_data = couch.delete_file(_id, _rev)
-        
+
         return "success"
     except:
         return "error"
@@ -229,8 +227,8 @@ def get_submit_bash(__release, _id, __scram):
     #--------------------------------------------------
     return comm
      
-@app.route('/das_driver', methods=["GET","POST"])
-def das_driver():
+@app.route('/das_driver_all', methods=["GET","POST"])
+def das_driver_all():
     """
     Takes the dataset name and checks in DAS if it's in there, if the dataset is stored
     in disk and if so - download the needed .root file for cmsRun to launch
@@ -264,9 +262,9 @@ def das_driver():
     data = json.loads(request.get_data())
     __release = data['CMSSW']
     _id = data['_id']
-    _rev = data['_rev']
+    _rev = couch.get_file(_id)['_rev']
     doc = json.dumps(data['doc'])
-    req = data['req']
+    req = couch.get_file(_id)['data']['req']
     os.chdir(WORK_DIR + "/Test_Folder/"+__release +"/src")
     i = 0
     fileNames = {}
@@ -283,11 +281,49 @@ def das_driver():
         err_file.close()
         log2_file.close()
         err2_file.close()
-
-    
-                
-
     return json.dumps(fileNames)
+
+@app.route('/das_driver_single', methods=['GET','POST'])
+def das_driver_single():    
+    """
+    Same as above, just does it with single dataset, could refactor to use the same function, but maybe laterz
+    """
+    data = json.loads(request.get_data())
+    dsName = data['_id']
+    __release = data['CMSSW']
+    os.chdir(WORK_DIR + "/Test_Folder/"+__release +"/src")
+    fileNames = {}
+    fileNames[dsName] = {}
+    log_file = file('dasTest_outSingle.txt','w+')
+    err_file = file('dasTest_errSingle.txt','w+')
+    log2_file = file('dasTest_2outSingle.txt','w+')
+    err2_file = file('dasTest_2errSingle.txt','w+')
+    proc = subprocess.call("eval `scramv1 runtime -sh`; cat /afs/cern.ch/user/j/jsiderav/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY=$(voms-proxy-info --path); das_client.py  --limit 0 --query 'site dataset="+dsName+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log_file,stderr=err_file,shell=True)
+    log_file.seek(0)
+    err_file.seek(0)
+    text = log_file.read()
+    data = json.loads(text)
+    for item in data['data']:
+        for site in item['site']:
+            if 'dataset_fraction' in site and site['kind']=="Disk":
+                print site['name']
+                proc = subprocess.call("eval `scramv1 runtime -sh`; cat /afs/cern.ch/user/j/jsiderav/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY=$(voms-proxy-info --path); das_client.py  --limit 10 --query 'file dataset="+dsName+" site="+site['name']+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log2_file, stderr=err2_file, shell=True)
+                log2_file.seek(0)
+                err2_file.seek(0)
+                text2 = log2_file.read()
+                data2 = json.loads(text2)
+                for item2 in data2['data']:
+                    for root in item2['file']:
+                        print root['name']
+                        fileNames[dsName]['file'] = root['name']
+                        return json.dumps(fileNames)
+    print("something is wrong with this ds")
+    log_file.close()
+    err_file.close()
+    log2_file.close()
+    err2_file.close()
+    return "No"
+       
 @app.route('/test_campaign', methods=["GET","POST"])
 def test_campaign():
     """

@@ -86,7 +86,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       alert("Dataset name already exists");
     }
   };
-
+//===Removes dataset of a campaign by given name===///
   $scope.removeReq = function(name)
   {   
     if ((name in $scope.data['req'])){
@@ -146,18 +146,17 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       }
     }
   };
-  $scope.sendToDas = function ()
+///===Takes the campaign and all of it's datasets and checks in das if it has a file stored in DAS and in Disk===///
+  $scope.sendToDasAll = function ()
     {
     $scope.alertMsg['show'] = false;
     $scope.working_on = true;
-   // $scope.is_tested = false;
     $http({
       method: 'POST', 
-      url:'das_driver', 
+      url:'das_driver_all', 
       data: {
               'doc' : $scope.doc, 
               '_id': $scope.data['_id'],
-              '_rev' : $scope.doc['_rev'],
               'CMSSW' : $scope.data['CMSSW'],
               'req' : $scope.data['req']
 
@@ -170,7 +169,6 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
                     $scope.alertMsg = {error : true, msg : "Failed retrieving file in DAS", show : true};   
                     $scope.data['req'][key]['errDas'] = true;         
                 }
-
         else{
                     angular.forEach($scope.data['req'][key]['action'], function (value2,key2){
                         if($scope.data['req'][key]['action'][key2] != "" && $scope.allOpt[key][key2] != undefined){
@@ -183,11 +181,46 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
             $scope.working_on = false;
             });
     }).error(function(status){
-        $scope.working_on = false
+       $scope.working_on = false
       $scope.alertMsg = {error : true, msg : "Failed contacting DAS", show : true};
       console.log("Error while updating the doc: " + status);
     }); 
 
+    }
+///===Same as above, just with a single dataset, needed for the detailed view===///
+  $scope.sendToDasSingle = function(nameVal)
+    {
+     $scope.working_on = true;
+     $scope.alertMsg['show'] = false;
+     $http({
+            method:'POST',
+            url:"das_driver_single",
+            data: {
+                    '_id' : nameVal,
+                    'CMSSW' : $scope.data['CMSSW'],
+                    }
+        }).success(function(data,status){
+            $scope.data['req'][nameVal]['file'] = data[nameVal]['file'];
+            console.log($scope.data['req'][nameVal]['file']);      
+            if ($scope.data['req'][nameVal]['file']=="No"){
+                        $scope.alertMsg = {error : true, msg : "Failed retrieving file in DAS", show : true};   
+                        $scope.data['req'][nameVal]['errDas'] = true;         
+                    }
+            else{
+                        angular.forEach($scope.data['req'][nameVal]['action'], function (value2,key2){
+                            if($scope.data['req'][nameVal]['action'][key2] != "" && $scope.allOpt[nameVal][key2] != undefined){
+                                    $scope.data['req'][nameVal]['action'][key2]['filein'] = data[nameVal]['file']; 
+                                    $scope.data['req'][nameVal]['errDas'] = false;         
+                                    $scope.allOpt[nameVal][key2]['filein'] = 'filein';                   
+                            }; 
+                });
+            };
+             $scope.working_on = false;
+        }).error(function(data,status){
+                  $scope.working_on = false
+                  $scope.alertMsg = {error : true, msg : "Failed contacting DAS", show : true};
+                  console.log("Error while updating the doc: " + status);
+        });
     }
   //================Helper methods==================//
 
@@ -740,12 +773,21 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.loadData();
         $scope.testDoc();
     }
+///===delete button in campaign list - loads and deletes campaign if confirmed in the popup window(produces console errors in FF somewhy)===///
   $scope.allViewDelete = function(nameVal)
     {
      if(confirm("Are you sure you want to delete "+nameVal+'?' )){
             $scope.data['_id'] = nameVal;   
             $scope.deleteData();
         }    
+    }
+///===get das input files button in campaign list - loads and searches DAS for the input files (/store/blabla/089913 and etc.)===/// 
+  $scope.allViewGetFromDas = function(nameVal)
+    {
+        $scope.data['_id'] = nameVal;
+        $scope.loadData();
+        $scope.sendToDasAll();
+        
     }
   $scope.submitCampaign = function()
   {
