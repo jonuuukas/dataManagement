@@ -7,8 +7,8 @@
       <link rel=stylesheet type=text/css href="static/css/style.css">
       <script type=text/javascript src="static/js/angular.js"></script>
       <script type=text/javascript src="static/js/controllers.js"></script>
-      <script type=text/javascript src="static/js/ui-bootstrap-tpls-0.12.1.js"></script>   
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script type=text/javascript src="static/js/ui-bootstrap-tpls-0.12.1.js"></script>   
       <script src="https://use.fontawesome.com/cc110ae827.js"></script>
 
    </head>
@@ -29,12 +29,12 @@
                   <input type="text" ng-model="data['_id']" typeahead="elem for elem in list | filter:$viewValue | limitTo:10" class="form-control">
 
                   <button type="submit" tooltip="Restore the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="inTheList" ng-click="loadData()">Load data <i class="fa fa-cloud-upload" aria-hidden="true"></i></button>
-                  <button type="submit" tooltip="Save the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="!doc['submitted'] && inTheList" ng-click="updateDoc()">Update doc <i class="fa fa-floppy-o" aria-hidden="true"></i></button>
-                  <button type="submit" tooltip="Test current datasets by running them through cmsRun" tooltip-placement="bottom" class="btn btn-warning" ng-if="!doc['submitted'] && inTheList" ng-click="testDoc()">Test Doc <i class="fa fa-info-circle" aria-hidden="true"></i></button>
+                  <button type="submit" tooltip="Save the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="!doc['submitted'] && inTheList" ng-click="updateDoc()">Save Changes <i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+                  <!--<button type="submit" tooltip="Test current datasets by running them through cmsRun" tooltip-placement="bottom" class="btn btn-warning" ng-if="!doc['submitted'] && inTheList" ng-click="testDoc()">Test Doc <i class="fa fa-info-circle" aria-hidden="true"></i></button>
                   <button type="submit"  tooltip="Save the current campaign" tooltip-placement="bottom"  class="btn btn-primary" ng-if="!inTheList" ng-click="saveDoc()">Save doc <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
 
 
-                  <button type="submit" tooltip="WARNING: You can only submit the campaign once. Any changes will have to be saved to another campaign" tooltip-placement="bottom" class="btn btn-danger" ng-if="!doc['submitted'] && inTheList" ng-click="submitCampaign()">Submit campaign <i class="fa fa-sign-out" aria-hidden="true"></i></button> 
+                  <button type="submit" tooltip="WARNING: You can only submit the campaign once. Any changes will have to be saved to another campaign" tooltip-placement="bottom" class="btn btn-danger" ng-if="!doc['submitted'] && inTheList" ng-click="submitCampaign()">Submit campaign <i class="fa fa-sign-out" aria-hidden="true"></i></button> --->
                     <i ng-show="working_on" class="fa fa-circle-o-notch fa-spin fa-lg fa-fw ng-hide"></i><span class="sr-only">Loading...</span>
                   
                   <span class="{{((alertMsg['error']) ? 'alert alert-danger' : 'alert alert-success')}}" role="alert" ng-if="alertMsg['show']">
@@ -82,7 +82,15 @@
         <div id = "campaignView" class="animate-switch" ng-switch-when="campaign">  
                 <ol class="breadcrumb">
                     <li><a ng-click="backButton('campaign')">All Campaigns</a></li>
-                    <li class="active">{{data['_id']}}</li>
+                    <li class="active">{{data['_id']}}
+                    <button class="btn btn-link" tooltip="Test Campaign" tooltip-placement="up" ng-click="allViewTest(data['_id'])"><i class="fa fa-wrench" aria-hidden="true"></i></button>
+        <button class="{{((doc['submitted']) ? 'btn btn-link disabled' : 'btn btn-link active')}}"  tooltip="Submit Campaign" tooltip-placement="up" ng-click="allViewSubmit(data['_id'])"><i class="fa fa-font-awesome" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-link" tooltip="Get Input files for the campaign's datasets" tooltip-placement="up" ng-click="allViewGetFromDas(data['_id'])"><i class="fa fa-database" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-link" tooltip="Delete Campaign" tooltip-placement="up" ng-click="allViewDelete(data['_id'])"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
+
+</li>
+                    
+
                 </ol>   
             <div class="row">
                <div class="col-lg-12">
@@ -105,13 +113,6 @@
 
                      <button type="submit" class="btn btn-success"  ng-click="addReq(new_dsName)">
                         <div class="glyphicon glyphicon-plus" aria-hidden="true"></div> Add
-                     </button>
-                     <button type="submit" class="btn btn-danger" ng-click="removeReq(new_dsName)"> 
-                        <div class="glyphicon glyphicon-minus" aria-hidden="true"></div> Remove
-                     </button>
-                    <button type="submit" class="btn btn-warning" ng-click="sendToDasAll()"> 
-                        <i class="fa fa-folder-o" aria-hidden="true"></i>                        
-                        Get input files
                      </button>
                   </div>
                   <hr style="border-top: 3px solid #eee">
@@ -144,7 +145,7 @@
                         <button class="btn btn-link" tooltip="Edit Dataset" tooltip-placement="up" ng-click="navigateDetailedView(name)"><i class="fa fa-pencil" aria-hidden="true"></i>
                         </button>
                         <button type="button" class="btn btn-link" tooltip="Get Input files for the campaign's datasets" tooltip-placement="up" ng-click="sendToDasSingle(name)"><i class="fa fa-database" aria-hidden="true"></i></button>
-                        <button type="button" class="btn btn-link" tooltip="Delete Dataset" tooltip-placement="up" ng-click="removeReq(name)"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
+                        <button type="button" class="btn btn-link" tooltip="Delete Dataset" tooltip-placement="up" ng-click="detailedViewDelete(name)"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
                         </td>
 
                         <td><i class="{{((data['req'][name]['errDas']) ? 'fa fa-times' : 'fa fa-check')}}" aria-hidden="true"></i></td>
@@ -434,60 +435,43 @@
 
                      </accordion-group>
                   </div>
+ 
                </div>
+<div class="row"><hr></div>
+                                 <accordion>
+                                    <accordion-group is-open="sixthStatus.open">
+                                       <accordion-heading>
+                                          Full JSON
+                                          <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sixthStatus.open, 'glyphicon-chevron-right': !sixthStatus.open}"></i>
+                                       </accordion-heading>
+                                       <pre><button class="btn btn-primary" style="float:right" ng-click="copyToClipboard(data)" tooltip="Copy to clipboard" tooltip-placement="up"><i class="fa fa-clipboard" aria-hidden="true"></i></button>{{data | json}}</pre>
+                                       <pre><button class="btn btn-primary" style="float:right" ng-click="copyToClipboard(drive)" tooltip="Copy to clipboard" tooltip-placement="up"><i class="fa fa-clipboard" aria-hidden="true"></i></button>{{drive | json}}</pre>
+                                    </accordion-group>
+                                 </accordion>  
         </div>
 
             </accordion-group>
+                                             
             </accordion>
+
+
             
 <div id="detailedView" class="animate-switch" ng-switch-when="detailed">
             <ol class="breadcrumb">
                     <li><a ng-click="backButton('campaign')">All Campaigns</a></li>
                     <li><a ng-click="backButton('detailed')">{{data['_id']}}</a></li>
-                    <li class="active">{{currentDs}}</li>
-            </ol>
-            <accordion close-others="false" ng-show="is_tested">
-            <accordion-group is-open="status.open">
-               <accordion-heading>
-                  Test Output
-                  <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                  </accordion-heading>
-                     <div class="row" ng-repeat="(name, info) in data['req']">
-                     <div class='col-lg-12'>
-                     <accordion close-others="oneAtATime">
-                        <accordion-group is-open="secondStatus.open">
-                           
-                                       <accordion-heading>
-                                       {{name}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': secondStatus.open, 'glyphicon-chevron-right': !secondStatus.open}"></i>
-                                       </accordion-heading>
-                                          <div class ="col-lg-12">
-                                          <ul class="nav nav-tabs">
-                                           <li ng-click="item=1"><a data-toggle="tab">StdErr</a>  </li>
-                                           <li ng-click="item=2"> <a data-toggle="tab"> StdOut</a></li>
-                                          </ul>
-                                 
-                                               <div class="tab-content" ng-init='item=1'>
-                                                    <div ng-show='item == 1'>
-                                                      <h3>StdErr</h3>
-                                                      <pre id="testOutput" style="margin-top: 5px">{{info['stderr']}}</pre>
-                                                   </div>
-                                                   <div ng-show='item == 2'>
-                                                      <h3>StdOut</h3>
-                                                      <pre id="testOutput" style="margin-top: 5px">{{info['stdout']}}</pre>
-                                                   </div>
-                                                </div>
+                    <li class="dropdown">
+                         <span dropdown>
+                        <a class="dropdown-toggle" style="color:white" dropdown-toggle>
+                            {{currentDs}}<i class="fa fa-angle-double-down"  aria-hidden="true"></i>
+                        </a>
+                        <ul class="dropdown-menu" dropdown-menu>
+                          <li ng-repeat="(name2, info2) in data['req']" ng-show="name2!=currentDs"><a ng-click="navigateDetailedView(name2)"><h4>{{name2}}</h4></a></li>
+                        </ul>
+                    </li>
+            </ol>     
 
-                                          </div>
-                        </accordion-group>
-                     </accordion>
-                     </div>
-                     </div>
-
-            </accordion-group>
-            </accordion>
-            
             <div ng-repeat="(name, info) in data['req']" ng-show="name==currentDs">
-                    <h2>{{name}}</h2>
                      <div class="row">
                         <div class="col-md-12 h4">
                            Add/Delete steps: 
@@ -654,20 +638,26 @@
                            </div>
                         </div>
                      </ng-form>
+                <hr></hr>
+                 <ul class="nav nav-tabs btn-group">
+                                           <li ng-click="item=1"><a class="btn btn-primary" data-toggle="tab">StdErr</a>  </li>
+                                           <li ng-click="item=2"> <a class="btn btn-primary" data-toggle="tab">StdOut</a></li>
+                                          </ul>
+                <div class="tab-content" ng-init='item=1' ng-show="doc['is_tested']">
+                    <h3>Test Output for {{name}}</h3>
+                     <div ng-show='item == 1'>
+                          <h3>StdErr</h3>
+                          <pre id="testOutput" style="margin-top: 5px">{{info['stderr']}}</pre>
+                     </div>
+                    <div ng-show='item == 2'>
+                         <h3>StdOut</h3>
+                         <pre id="testOutput" style="margin-top: 5px">{{info['stdout']}}</pre>
+                    </div>
+                 </div>
             </div>
          </form>
         
-         <div class="row"><hr></div>
-         <accordion close-others="oneAtATime">
-            <accordion-group is-open="status.open">
-               <accordion-heading>
-                  Full JSON
-                  <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-               </accordion-heading>
-               <pre><button class="btn btn-primary" style="float:right" ng-click="copyToClipboard(data)" tooltip="Copy to clipboard" tooltip-placement="up"><i class="fa fa-clipboard" aria-hidden="true"></i></button>{{data | json}}</pre>
-               <pre><button class="btn btn-primary" style="float:right" ng-click="copyToClipboard(drive)" tooltip="Copy to clipboard" tooltip-placement="up"><i class="fa fa-clipboard" aria-hidden="true"></i></button>{{drive | json}}</pre>
-            </accordion-group>
-         </accordion>         
+
       </div>
     </div>
 </div>
