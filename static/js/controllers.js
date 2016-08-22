@@ -592,27 +592,26 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       if (data == 'No scram'){
         $scope.alertMsg = {error : true, msg : "Test was unsuccessful. Scram version was not found for this CMSSW version", show : true};
       }
-      else if (data['flag'] == "Fatality"){
-        $scope.alertMsg = {error : true, msg : "Fatal exception was found for " + $scope.data['_id']+ ". See Test Output", show : true};
-      }
-      else{
-      $scope.alertMsg = {error:false, msg: "No fatal errors for " + $scope.data['_id']+ ". See Test Output to be sure", show : true};
-    }
     $scope.working_on = false;
     angular.forEach($scope.data['req'], function (value, key){  //key is the name of dataset
+     if (data[key]['flag'] == "Fatality"){
+        $scope.alertMsg = {error : true, msg : "Fatal exception was found for " + $scope.data['_id']+ ". See Test Output", show : true};
+        $scope.data['req'][key]['flag'] = false;
+      }
+    else{
+      $scope.data['req'][key]['flag'] = true;
+      console.log("Test run succeeded for " + $scope.data['_id']+ ", check Test Output for results")
+    }
       $scope.data['req'][key]['stderr'] = data[key]['stderr'];
       $scope.data['req'][key]['stdout'] = data[key]['stdout'];
-
-      console.log($scope.data['req'][key]['stderr']);
-      console.log("Test run succeeded for " + $scope.data['_id']+ ", check Test Output for results")
     });
     }).error(function(status){
       $scope.alertMsg = {error: true, msg : "Test failed, check the logs", show : true};
       $scope.working_on = false;
       console.log("Error while running the test for " + $scope.data['_id']+ ": " + status);
-    });
-
+    });    
   };
+
   $scope.getAllDocs = function()
   {
     $scope.list = [];

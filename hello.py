@@ -384,7 +384,7 @@ def test_campaign():
             err_file.close()
 
             if str(dynamicLogger[req.keys()[i]]['stderr']).find("Begin fatal exception"):
-                dynamicLogger['flag']="Fatality"    #subzero ftw
+                dynamicLogger[req.keys()[i]]['flag']="Fatality"    #subzero ftw
             i+=1
     cfgFile.close()
 

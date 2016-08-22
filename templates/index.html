@@ -109,7 +109,7 @@
                      <button type="submit" class="btn btn-danger" ng-click="removeReq(new_dsName)"> 
                         <div class="glyphicon glyphicon-minus" aria-hidden="true"></div> Remove
                      </button>
-                    <button type="submit" class="btn btn-warning" ng-click="sendToDas()"> 
+                    <button type="submit" class="btn btn-warning" ng-click="sendToDasAll()"> 
                         <i class="fa fa-folder-o" aria-hidden="true"></i>                        
                         Get input files
                      </button>
@@ -128,6 +128,7 @@
                       <tr>
                         <th>Campaign Name</th>
                         <th>Actions</th>
+                        <th>DAS Input</th>
                         <th>Test</th>
                         <th>Reco</th>
                         <th>Skim</th>
@@ -142,12 +143,12 @@
                         <td>
                         <button class="btn btn-link" tooltip="Edit Dataset" tooltip-placement="up" ng-click="navigateDetailedView(name)"><i class="fa fa-pencil" aria-hidden="true"></i>
                         </button>
-                                <button class="btn btn-link" tooltip="Test Campaign" tooltip-placement="up" ng-click=""><i class="fa fa-wrench" aria-hidden="true"></i></button>
-                                <button class="{{((additionalList[$index]['submitted']) ? 'btn btn-link disabled' : 'btn btn-link active')}}"  tooltip="Submit Campaign" tooltip-placement="up" ng-click="allViewSubmit(name)"><i class="fa fa-font-awesome" aria-hidden="true"></i></button>
-        <button type="button" class="btn btn-link" tooltip="Get Input files for the campaign's datasets" tooltip-placement="up" ng-click="sendToDasSingle(name)"><i class="fa fa-database" aria-hidden="true"></i></button>
-        <button type="button" class="btn btn-link" tooltip="Delete Dataset" tooltip-placement="up" ng-click="removeReq(name)"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
+                        <button type="button" class="btn btn-link" tooltip="Get Input files for the campaign's datasets" tooltip-placement="up" ng-click="sendToDasSingle(name)"><i class="fa fa-database" aria-hidden="true"></i></button>
+                        <button type="button" class="btn btn-link" tooltip="Delete Dataset" tooltip-placement="up" ng-click="removeReq(name)"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
                         </td>
+
                         <td><i class="{{((data['req'][name]['errDas']) ? 'fa fa-times' : 'fa fa-check')}}" aria-hidden="true"></i></td>
+                        <td><i class="{{((data['req'][name]['flag']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></i></td>
                         <td><i class="{{((check[name]['reco']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></td>
                         <td><i class="{{((check[name]['skim']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></td>
                         <td><i class="{{((check[name]['mini']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></td>
