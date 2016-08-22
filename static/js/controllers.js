@@ -1,5 +1,5 @@
 var myApp = angular.module('myApp', ['ui.bootstrap']);
-var loader = angular.module('loader', ['angular-loading-bar']);
+
 myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
 
@@ -588,7 +588,6 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       method: 'GET', 
       url:'get_all_docs', 
     }).success(function(data, status){
-      console.log(angular.toJson(data));
       angular.forEach(data, function (value, key){
         $scope.list.push(key);//did this to not mess up existing code. yes i know - not efficient, but more efficient than rewriting everything 
         $scope.additionalList.push(value);
@@ -676,26 +675,28 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 ///====Creates a request to delete the data by given _id of the file====///
   $scope.deleteData = function()
     {
-      var tempStr = $scope.data['_id'];
-      $http({
-            method: 'DELETE', 
-            url:'delete_doc', 
-            data: {
-                    '_id': $scope.data['_id']
-                  }
-          }).success(function(data, status){    
-              if(data=="success"){
-                $scope.alertMsg = {error : false, msg : "Successfully deleted campaign " + tempStr + ".", show : true};                
-                } 
-              else if (data=="error"){
-                $scope.alertMsg = {error : true, msg : "Wasn't able to delete " + tempStr + ".", show : true};
-                } 
-              $scope.getAllDocs();
-              $scope.data['_id'] = "CampaignName";
-        }).error(function(data, status){
-                $scope.alertMsg = {error : true, msg : "Wasn't able to delete " + tempStr + ".", show : true};
-            });
-        delete tempStr;
+
+          var tempStr = $scope.data['_id'];
+          $http({
+                method: 'DELETE', 
+                url:'delete_doc', 
+                data: {
+                        '_id': $scope.data['_id']
+                      }
+              }).success(function(data, status){    
+                  if(data=="success"){
+                    $scope.alertMsg = {error : false, msg : "Successfully deleted campaign " + tempStr + ".", show : true};                
+                    } 
+                  else if (data=="error"){
+                    $scope.alertMsg = {error : true, msg : "Wasn't able to delete " + tempStr + ".", show : true};
+                    } 
+                  $scope.getAllDocs();
+                  $scope.data['_id'] = "CampaignName";
+            }).error(function(data, status){
+                    $scope.alertMsg = {error : true, msg : "Wasnt able to delete " + tempStr + ".", show : true};
+                });
+            delete tempStr;
+
     };
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -741,9 +742,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     }
   $scope.allViewDelete = function(nameVal)
     {
-        $scope.data['_id'] = nameVal;   
-        $scope.deleteData();
-       // $scope.getAllDocs();
+     if(confirm("Are you sure you want to delete "+nameVal+'?' )){
+            $scope.data['_id'] = nameVal;   
+            $scope.deleteData();
+        }    
     }
   $scope.submitCampaign = function()
   {
@@ -1008,4 +1010,3 @@ myApp.directive("inlineEditable", function () {
         }
     }
 });
-

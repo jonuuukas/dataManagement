@@ -35,7 +35,7 @@
 
 
                   <button type="submit" tooltip="WARNING: You can only submit the campaign once. Any changes will have to be saved to another campaign" tooltip-placement="bottom" class="btn btn-danger" ng-if="!doc['submitted'] && inTheList" ng-click="submitCampaign()">Submit campaign <i class="fa fa-sign-out" aria-hidden="true"></i></button> 
-                    <i ng-show="working_on" class="fa fa-circle-o-notch fa-spin fa-2x fa-fw ng-hide"></i><span class="sr-only">Loading...</span>
+                    <i ng-show="working_on" class="fa fa-circle-o-notch fa-spin fa-lg fa-fw ng-hide"></i><span class="sr-only">Loading...</span>
                   
                   <span class="{{((alertMsg['error']) ? 'alert alert-danger' : 'alert alert-success')}}" role="alert" ng-if="alertMsg['show']">
                      <span class="{{((alertMsg['error']) ? 'glyphicon glyphicon-warning-sign' : 'glyphicon glyphicon-ok-sign')}}" aria-hidden="true"></span>
@@ -66,7 +66,7 @@
 </button>
         <button class="btn btn-link" tooltip="Test Campaign" tooltip-placement="up" ng-click="allViewTest(name)"><i class="fa fa-wrench" aria-hidden="true"></i></button>
         <button class="{{((additionalList[$index]['submitted']) ? 'btn btn-link disabled' : 'btn btn-link active')}}"  tooltip="Submit Campaign" tooltip-placement="up" ng-click="allViewSubmit(name)"><i class="fa fa-font-awesome" aria-hidden="true"></i></button>
-        <button class="btn btn-link" tooltip="Delete Campaign" tooltip-placement="up" ng-click="allViewDelete(name)"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
+        <button type="button" class="btn btn-link" tooltip="Delete Campaign" tooltip-placement="up" ng-click="allViewDelete(name)"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
         <td>{{additionalList[$index]['CMSSW']}}</td>
         <td>{{additionalList[$index]['era']}}</td>
         <td><i class="{{((additionalList[$index]['submitted']) ? 'fa fa-check' : 'fa fa-times')}}" aria-hidden="true"></i></td>
