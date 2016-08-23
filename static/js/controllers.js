@@ -19,6 +19,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.views = ["all","campaign","detailed"];
   $scope.selection = $scope.views[0];
   $scope.currentDs = "";
+  $scope.dsCount = 0;
   $scope.working_on = false;
   $scope.alertMsg = {error : false, msg : "", show : false};
   $scope.is_tested = false;
@@ -58,8 +59,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
                     "stdout" : {},
                     "stderr" : {}
   }
-  //=============Actions with datasets===========//
 
+///===Paginator functions===///
     $scope.setPage = function (pageNo) {
         $scope.currentPage = pageNo;
       };
@@ -70,8 +71,9 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 
     $scope.setItemsPerPage = function(num) {
       $scope.itemsPerPage = num;
-      $scope.currentPage = 1; //reset to first paghe
+      $scope.currentPage = 1; //reset to first page
     }
+//=============Actions with datasets===========//
   $scope.addReq = function(name)
   {
     console.log("addReq: " + name);   
@@ -710,6 +712,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         }
       }
       $scope.checkTests();
+      $scope.dsCount = Object.keys($scope.data['req']).length;
     }).error(function(status){
       $scope.alertMsg = {error : true, msg : "Loading was unsuccessful for " + $scope.data['_id']+ ".", show : true};
       console.log("Error while loading:" + status);

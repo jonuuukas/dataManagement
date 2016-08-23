@@ -75,12 +75,11 @@
                   </tr>
                 </tbody>
               </table>
-    <p>Total number of items: {{totalItems}}</p>
-    <pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="true" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+
+    <pagination total-items="totalItems" ng-model="currentPage"  style="float:right"max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="true" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                        <div class="footer">
                         <h4>View <span dropdown>
-                        <a class="dropdown-toggle" dropdown-toggle>
-                            {{itemsPerPage}}
-                        </a><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        <a class="dropdown-toggle" dropdown-toggle>{{itemsPerPage}}</a><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                         <ol class="dropdown-menu" dropdown-menu>
                           <li><a ng-click="setItemsPerPage(3)">3</a></li>
                           <li><a ng-click="setItemsPerPage(5)">5</a></li>
@@ -89,7 +88,8 @@
                           <li><a ng-click="setItemsPerPage(50)">50</a></li>
                         </ol> 
                         records at a time.</h4>                        
-    <hr/>
+                        <p>Total number of items: {{totalItems}}</p>
+                        </div>
 
             </div>
 
@@ -481,13 +481,13 @@
                     <li><a ng-click="backButton('campaign')">All Campaigns</a></li>
                     <li><a ng-click="backButton('detailed')">{{data['_id']}}</a></li>
                     <li class="dropdown">
-                         <span dropdown>
+                         <span dropdown >
                         <a class="dropdown-toggle" style="color:white" dropdown-toggle>
                             {{currentDs}}
                         </a>
-                        <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
-                        <ul class="dropdown-menu" dropdown-menu>
-                          <li ng-repeat="(name2, info2) in data['req']" ng-show="name2!=currentDs"><a ng-click="navigateDetailedView(name2)"><h4>{{name2}}</h4></a></li>
+                        <span class="glyphicon glyphicon-chevron-down" aria-hidden="true" ng-show="dsCount != 1"></span>
+                        <ul class="dropdown-menu" dropdown-menu ng-show="dsCount != 1">
+                          <li ng-repeat="(name2, info2) in data['req']" ng-show="(name2!=currentDs)"><a ng-click="navigateDetailedView(name2)"><h4>{{name2}}</h4></a></li>
                         </ul>
                     </li>
             </ol>     
