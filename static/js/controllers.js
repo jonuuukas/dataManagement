@@ -22,10 +22,14 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   $scope.working_on = false;
   $scope.alertMsg = {error : false, msg : "", show : false};
   $scope.is_tested = false;
-
   $scope.doc = {};
   $scope.check = {};
   $scope.drive = {};
+  $scope.viewby = 10;
+  $scope.totalItems;
+  $scope.currentPage = 1;
+  $scope.itemsPerPage = $scope.viewby;
+  $scope.maxSize = 5; //Number of pager buttons to show
   $scope.allOpt = {"Default" : {}};
   $scope.defCon = {};
   $scope.recoOpt = {
@@ -55,6 +59,19 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
                     "stderr" : {}
   }
   //=============Actions with datasets===========//
+
+    $scope.setPage = function (pageNo) {
+        $scope.currentPage = pageNo;
+      };
+
+      $scope.pageChanged = function() {
+        console.log('Page changed to: ' + $scope.currentPage);
+      };
+
+    $scope.setItemsPerPage = function(num) {
+      $scope.itemsPerPage = num;
+      $scope.currentPage = 1; //reset to first paghe
+    }
   $scope.addReq = function(name)
   {
     console.log("addReq: " + name);   
@@ -86,14 +103,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       alert("Dataset name already exists");
     }
   };
-//===Removes dataset of a campaign by given name===///
-  $scope.removeReq = function(name)
-  {   
-    if ((name in $scope.data['req'])){
-      delete $scope.data['req'][name];
-      delete $scope.drive[name];
-    }  
-  };
+
 
   $scope.addExtra = function(ds, action, name)
   {   
@@ -544,10 +554,10 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
             }
     }).success(function(data, status){
       $scope.loadData();
-      $scope.alertMsg = {error : false, msg : "Action was successful for " + $scope.data['_id']+ ".", show : true};     
+      $scope.alertMsg = {error : false, msg : "Succesfully saved changes of " + $scope.data['_id']+ ".", show : true};     
       console.log("Success updating the doc: " + data + " " + status);
     }).error(function(status){
-      $scope.alertMsg = {error : true, msg : "Action was unsuccessful for " + $scope.data['_id']+ ".", show : true};
+      $scope.alertMsg = {error : true, msg : "Saving was unsuccessful for " + $scope.data['_id']+ ".", show : true};
       console.log("Error while updating the doc: " + status);
     }); 
   };
@@ -623,6 +633,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
       angular.forEach(data, function (value, key){
         $scope.list.push(key);//did this to not mess up existing code. yes i know - not efficient, but more efficient than rewriting everything 
         $scope.additionalList.push(value);
+        $scope.totalItems = $scope.list.length;
+
     });
       console.log("Success. Got all docs");
     }).error(function(status){
@@ -698,7 +710,6 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         }
       }
       $scope.checkTests();
-      $scope.alertMsg = {error : false, msg : "Loading was successful for " + $scope.data['_id']+ ".", show : true};
     }).error(function(status){
       $scope.alertMsg = {error : true, msg : "Loading was unsuccessful for " + $scope.data['_id']+ ".", show : true};
       console.log("Error while loading:" + status);
@@ -737,7 +748,6 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
 ///////////////////////////////////////
 ///////////////////////////////////////
 ///////////////////////////////////////
-
 ///====Navigates to the dataset view of a campaign====////
  $scope.navigateDetailedView = function(nameVal){
     $scope.selection = "detailed";
@@ -788,6 +798,14 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
         $scope.sendToDasAll();
         
     }
+//===Removes dataset of a campaign by given name===///
+  $scope.detailedViewDelete = function(name)
+  {   
+    if (confirm("Are you sure you want to delete dataset: "+name) && (name in $scope.data['req'])){
+      delete $scope.data['req'][name];
+      delete $scope.drive[name];
+    }  
+  };
   $scope.submitCampaign = function()
   {
     $scope.alertMsg['show'] = false;
@@ -854,6 +872,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
     });
 
   };
+  
   //=======Get autoSkim matrix and puts into the input field=====//
   $scope.getAlCaMatrixValue = function ()
   {
@@ -1023,6 +1042,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   //==============Prepare data================//
   $scope.getAllDocs();
 
+
 });
 
 //===============JSON validator===============//
@@ -1051,3 +1071,4 @@ myApp.directive("inlineEditable", function () {
         }
     }
 });
+
