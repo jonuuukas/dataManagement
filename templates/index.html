@@ -30,7 +30,7 @@
 
                   <button type="submit" tooltip="Restore the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="inTheList" ng-click="loadData()">Load data <i class="fa fa-cloud-upload" aria-hidden="true"></i></button>
                   <button type="submit" tooltip="Save the current changes" tooltip-placement="bottom" class="btn btn-primary" ng-if="!doc['submitted'] && inTheList" ng-click="updateDoc()">Save Changes <i class="fa fa-floppy-o" aria-hidden="true"></i></button>
-<button type="submit"  tooltip="Save the current campaign" tooltip-placement="bottom"  class="btn btn-primary" ng-if="!inTheList" ng-click="saveDoc()">Save doc <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+<button type="submit"  tooltip="Save the current campaign" tooltip-placement="bottom"  class="btn btn-primary" ng-if="!inTheList" ng-click="saveDoc()">Create a new campaign <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
                   <!--<button type="submit" tooltip="Test current datasets by running them through cmsRun" tooltip-placement="bottom" class="btn btn-warning" ng-if="!doc['submitted'] && inTheList" ng-click="testDoc()">Test Doc <i class="fa fa-info-circle" aria-hidden="true"></i></button>
                   
 
@@ -660,7 +660,7 @@
                         </div>
                      </ng-form>
                 <hr></hr>
-                 <ul class="nav nav-tabs btn-group">
+                 <ul class="nav nav-tabs btn-group" ng-show="doc['is_tested']">
                                            <li ng-click="item=1"><a class="btn btn-primary" data-toggle="tab">StdErr</a>  </li>
                                            <li ng-click="item=2"> <a class="btn btn-primary" data-toggle="tab">StdOut</a></li>
                                           </ul>
