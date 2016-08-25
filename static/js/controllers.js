@@ -60,6 +60,32 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
                     "stderr" : {}
   }
 
+
+
+//===Resets the original values to create a new campaign with fresh data==///
+    $scope.clearData = function (){
+       var tempName = $scope.data["_id"];
+          $scope.data = { 
+                  "_id" : tempName, 
+                  "CMSSW":"CMSSW_7_4_0_pre6", 
+                  "GT": "GT", 
+                  "era":"2012A", 
+                  "prio": 79000, 
+                  "req":{}, 
+                  "transient_output" : "[]"
+                };
+          $scope.drive = {};
+          $scope.check = {};
+          $scope.allOpt = {"Default" : {}};
+          $scope.jsons = {
+                            "alca" : {},
+                            "skim" : {},
+                            "lumi" : {}
+                          };
+          $scope.defCon = {};
+          $scope.submitted = false;
+          $scope.is_tested = false;
+};
 ///===Paginator functions===///
     $scope.setPage = function (pageNo) {
         $scope.currentPage = pageNo;
@@ -648,6 +674,7 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
   {
     $scope.alertMsg['show'] = false;
     $scope.cleanDrive();
+    $scope.clearData();
     $scope.working_on = true;
     $http({
       method: 'POST', 
