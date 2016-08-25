@@ -1,4 +1,4 @@
-# Data management application
+#<h3> Data management application</h3>
 ```json
 {
   "/": "\n    Opening function that directs to index.html\n    ", 
