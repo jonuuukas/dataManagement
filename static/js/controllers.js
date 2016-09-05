@@ -10,7 +10,8 @@ myApp.controller('myAppCtrl', function ($scope, $http, $location) {
                   "era":"2012A", 
                   "prio": 79000, 
                   "req":{}, 
-                  "transient_output" : "[]"
+                  "transient_output" : "[]",
+                  "procStr":"01Jan2012"
                 };
   $scope.checkAll = {reco : false, skim : false, mini :false};
   $scope.inTheList;
