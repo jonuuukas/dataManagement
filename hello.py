@@ -9,16 +9,19 @@ import sys
 import datetime
 import xml.dom.minidom
 import imp
+
 from couchdb_interface import CouchDBInterface
+from config import CONFIG
+
 
 from flask import Flask, send_from_directory, redirect, Response, make_response, request, jsonify
 from subprocess import Popen, PIPE
 app = Flask(__name__)
 ###original
-WORK_DIR = '/afs/cern.ch/user/j/jsiderav/public/dataManagement/stuff'
+WORK_DIR = CONFIG.WORK_DIR
 WORKDIR = ''
 couch = CouchDBInterface()
-cred = '/afs/cern.ch/user/j/jsiderav/private/PdmVService.txt'
+cred = CONFIG.PRIV_CRED
 
 ###
 ###Replaced with below
@@ -45,7 +48,7 @@ def get_scram(__release):
     and returns the architecture name if found
     """
     scram = ''
-    xml_data = xml.dom.minidom.parseString(os.popen("curl -s --insecure 'https://cmssdt.cern.ch/SDT/cgi-bin/ReleasesXML/?anytype=1'").read())
+    xml_data = xml.dom.minidom.parseString(os.popen("curl -s --insecure '%s'" % CONFIG.REL_XML).read())
     
     for arch in xml_data.documentElement.getElementsByTagName("architecture"):
         scram_arch = arch.getAttribute('name')
@@ -67,14 +70,46 @@ def load_data():
     doc_data = couch.get_file(_id)
     return json.dumps(doc_data)
 
+@app.route('/delete_doc', methods=["DELETE"])
+def delete_data():
+    """
+    Sends a request to couchDB to delete the given document
+    according to the _id var of the record
+    """
+    data = json.loads(request.get_data())
+    _id = data['_id']
+    _rev = couch.get_file(_id)['_rev']
+    try:
+        doc_data = couch.delete_file(_id, _rev)
+
+        return "success"
+    except:
+        return "error"
+
 @app.route('/get_all_docs', methods=["GET"])
 def get_all_docs():
     """
     Used in saveDocs() function to get all docs and later for the 
     object to be pushed in to the data list
     """
+    info = {}
     info = couch.get_all_docs()
-    return json.dumps(info)
+    fullInfo = {}
+    x = {}
+    for rows in info['rows']:
+        x = couch.get_file(rows['id'])
+        name = x['data']['_id']
+        fullInfo[name] = {}
+        try:
+            fullInfo[name]['era'] = x['data']['era']
+            fullInfo[name]['CMSSW'] = x['data']['CMSSW']
+            fullInfo[name]['submitted'] = x['submitted']
+
+            fullInfo[name]['is_tested'] = x['is_tested']
+
+        except:
+            fullInfo[name]['is_tested'] = False
+    return json.dumps(fullInfo)
 
 @app.route('/update_file', methods=["POST"])
 def update_file():
@@ -87,6 +122,7 @@ def update_file():
     data['doc']['alca'] = data['alca']
     data['doc']['skim'] = data['skim']
     data['doc']['lumi'] = data['lumi']
+    data['doc']['is_tested'] = data['is_tested']
     doc = json.dumps(data['doc'])
     doc_data = couch.update_file(_id, doc, _rev)
     return json.dumps(doc_data)
@@ -99,7 +135,7 @@ def get_skim_matrix_val():
     """
     file = "temporarySkim.py"
     data = json.loads(request.get_data())
-    url = "https://raw.githubusercontent.com/cms-sw/cmssw/"+data['CMSSW']+"/Configuration/Skimming/python/autoSkim.py"
+    url = CONFIG.GIT_CMSSW + data['CMSSW'] + "/Configuration/Skimming/python/autoSkim.py"
     response = urllib2.urlopen(url)
     fh = open(file, 'w')
     fh.write(response.read())
@@ -115,7 +151,7 @@ def get_alca_matrix_val():
     """
     file = "temporaryAlca.py"
     data = json.loads(request.get_data())
-    url = "https://raw.githubusercontent.com/cms-sw/cmssw/"+data['CMSSW']+"/Configuration/AlCa/python/autoAlca.py"
+    url = CONFIG.GIT_CMSSW+data['CMSSW']+"/Configuration/AlCa/python/autoAlca.py"
     response = urllib2.urlopen(url)
     fh = open(file, 'w')
     fh.write(response.read())
@@ -148,8 +184,8 @@ def get_test_bash(__release, _id, __scram):
     comm += "cd %s/src\n" % (__release)
     comm += "rm step_make.py\n"
     comm += "rm couchdb_interface.py\n"
-    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
-    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
+    comm += "wget %s\n" %CONFIG.GIT_STEP_MAKE
+    comm += "wget %s\n" %CONFIG.GIT_COUCHDB
     # comm += "eval `scram runtime -sh`\n"
     comm += "eval `scram runtime -sh` && python step_make.py --in=%s\n" % (_id)
     comm += "cat %s | voms-proxy-init -voms cms -pwstdin\n" %(cred)
@@ -177,25 +213,25 @@ def get_submit_bash(__release, _id, __scram):
     # comm += "cd Configuration/Skimming\n"
     # comm += "wget https://raw.githubusercontent.com/cms-sw/cmssw/CMSSW_8_0_1/Configuration/Skimming/python/autoSkim.py\n"
     #####################LOCAL REPO IS CURRENTLY BEING USED FOR THE WGET LINES#################
-    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/step_make.py\n"
-    comm += "wget https://raw.githubusercontent.com/jonuuukas/dataManagement/master/couchdb_interface.py\n"
+    comm += "wget %s\n" %CONFIG.GIT_STEP_MAKE
+    comm += "wget %s\n" %CONFIG.GIT_COUCHDB
     ######################################SEE ABOVE, NOOB######################################
     comm += "python step_make.py --in=%s\n" % (_id)
     #-------------For wmcontrol.py---------------------
-    comm += "source /afs/cern.ch/cms/PPD/PdmV/tools/wmclient/current/etc/wmclient.sh\n" 
+    comm += "source %s\n" %CONFIG.WMCLIENT
     comm += "export PATH=/afs/cern.ch/cms/PPD/PdmV/tools/wmcontrol_testful:${PATH}\n"
     comm += "cat %s | voms-proxy-init -voms cms -pwstdin\n" %(cred)
     comm += "echo 'executing scram runtime'\n"
     comm += "eval `scram runtime -sh`\n"
     comm += "echo 'executing export'\n"
-    comm += "export X509_USER_PROXY=$(voms-proxy-info --path)\n"
+    comm += "export X509_USER_PROXY="+CONFIG.USER_PROXY+"\n"
     comm += "echo 'executing step wmcontrol.py'\n"
     comm += "wmcontrol.py --wmtest --req_file=master.conf\n"
     #--------------------------------------------------
     return comm
      
-@app.route('/das_driver', methods=["GET","POST"])
-def das_driver():
+@app.route('/das_driver_all', methods=["GET","POST"])
+def das_driver_all():
     """
     Takes the dataset name and checks in DAS if it's in there, if the dataset is stored
     in disk and if so - download the needed .root file for cmsRun to launch
@@ -205,7 +241,7 @@ def das_driver():
         Local scope method which loops through the result of das_client queries, 
         exits on first found result, doesn't bother too much
         """
-        proc = subprocess.call("eval `scramv1 runtime -sh`; cat /afs/cern.ch/user/j/jsiderav/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY=$(voms-proxy-info --path); das_client.py  --limit 0 --query 'site dataset="+key+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log_file,stderr=err_file,shell=True)
+        proc = subprocess.call("eval `scramv1 runtime -sh`; cat "+cred+" | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY="+CONFIG.USER_PROXY+"; das_client.py  --limit 0 --query 'site dataset="+key+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log_file,stderr=err_file,shell=True)
         log_file.seek(0)
         err_file.seek(0)
         text = log_file.read()
@@ -213,25 +249,22 @@ def das_driver():
         for item in data['data']:
             for site in item['site']:
                 if 'dataset_fraction' in site and site['kind']=="Disk":
-                    print site['name']
-                    proc = subprocess.call("eval `scramv1 runtime -sh`; cat /afs/cern.ch/user/j/jsiderav/private/PdmVService.txt | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY=$(voms-proxy-info --path); das_client.py  --limit 10 --query 'file dataset="+key+" site="+site['name']+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log2_file, stderr=err2_file, shell=True)
+                    proc = subprocess.call("eval `scramv1 runtime -sh`; cat "+cred+" | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY="+CONFIG.USER_PROXY+"; das_client.py  --limit 10 --query 'file dataset="+key+" site="+site['name']+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log2_file, stderr=err2_file, shell=True)
                     log2_file.seek(0)
                     err2_file.seek(0)
                     text2 = log2_file.read()
                     data2 = json.loads(text2)
                     for item2 in data2['data']:
                         for root in item2['file']:
-                            print root['name']
                             return root['name']
-        print ("Something is not right with me")
         return ("No")
             
     data = json.loads(request.get_data())
     __release = data['CMSSW']
     _id = data['_id']
-    _rev = data['_rev']
+    _rev = couch.get_file(_id)['_rev']
     doc = json.dumps(data['doc'])
-    req = data['req']
+    req = couch.get_file(_id)['data']['req']
     os.chdir(WORK_DIR + "/Test_Folder/"+__release +"/src")
     i = 0
     fileNames = {}
@@ -241,18 +274,52 @@ def das_driver():
         err_file = file('dasTest_err'+str(i)+'.txt','w+')
         log2_file = file('dasTest_2out'+str(i)+'.txt','w+')
         err2_file = file('dasTest_2err'+str(i)+'.txt','w+')
-        print key
         fileNames[key]['file'] = check_ds()
         i+=1
         log_file.close()
         err_file.close()
         log2_file.close()
         err2_file.close()
-
-    
-                
-
     return json.dumps(fileNames)
+
+@app.route('/das_driver_single', methods=['GET','POST'])
+def das_driver_single():    
+    """
+    Same as above, just does it with single dataset, could refactor to use the same function, but maybe laterz
+    """
+    data = json.loads(request.get_data())
+    dsName = data['_id']
+    __release = data['CMSSW']
+    os.chdir(WORK_DIR + "/Test_Folder/"+__release +"/src")
+    fileNames = {}
+    fileNames[dsName] = {}
+    log_file = file('dasTest_outSingle.txt','w+')
+    err_file = file('dasTest_errSingle.txt','w+')
+    log2_file = file('dasTest_2outSingle.txt','w+')
+    err2_file = file('dasTest_2errSingle.txt','w+')
+    proc = subprocess.call("eval `scramv1 runtime -sh`; cat "+cred+" | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY="+CONFIG.USER_PROXY+"; das_client.py  --limit 0 --query 'site dataset="+dsName+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log_file,stderr=err_file,shell=True)
+    log_file.seek(0)
+    err_file.seek(0)
+    text = log_file.read()
+    data = json.loads(text)
+    for item in data['data']:
+        for site in item['site']:
+            if 'dataset_fraction' in site and site['kind']=="Disk":
+                proc = subprocess.call("eval `scramv1 runtime -sh`; cat "+cred+" | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY="+CONFIG.USER_PROXY+"; das_client.py  --limit 10 --query 'file dataset="+dsName+" site="+site['name']+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log2_file, stderr=err2_file, shell=True)
+                log2_file.seek(0)
+                err2_file.seek(0)
+                text2 = log2_file.read()
+                data2 = json.loads(text2)
+                for item2 in data2['data']:
+                    for root in item2['file']:
+                        fileNames[dsName]['file'] = root['name']
+                        return json.dumps(fileNames)
+    log_file.close()
+    err_file.close()
+    log2_file.close()
+    err2_file.close()
+    return "No"
+       
 @app.route('/test_campaign', methods=["GET","POST"])
 def test_campaign():
     """
@@ -274,7 +341,6 @@ def test_campaign():
 
     __curr_dir = os.getcwd()
     os.chdir(WORK_DIR)
-    print("changed dir to /stuff")
     __exec_file = open("tmp_test.sh", "w")
     __exec_file.write(get_test_bash(__release, _id, __scram))
     __exec_file.close()
@@ -285,15 +351,12 @@ def test_campaign():
     log_file.close()
     err_file.close()
     #_ret_code = proc.wait()
-    print("finished running tmp_test")
     #raise Exception(str(_ret_code))
     #-----------------Running the cmsRun command-------------------------
     os.chdir("Test_Folder" + '/' + __release + '/' + "src/")
     cfgFile = open("master.conf","r")
     i = 0   #loop needed to cycle through all the datasets and differ gathered information based on the dataset name
-    dynamicLogger={}
-    print ("starting the loop thrtough master.conf")
-    
+    dynamicLogger={}    
     for line in cfgFile:
         if line.startswith("cfg_path="):
 
@@ -313,12 +376,11 @@ def test_campaign():
             err_file.close()
 
             if str(dynamicLogger[req.keys()[i]]['stderr']).find("Begin fatal exception"):
-                dynamicLogger['flag']="Fatality"    #subzero ftw
+                dynamicLogger[req.keys()[i]]['flag']="Fatality"    #subzero ftw
             i+=1
     cfgFile.close()
 
 #-----------------Uploading log file-------------------------
-    print("finished looping. returning to the AngularJS")
     os.chdir(__curr_dir) ## back to working dir
     return json.dumps(dynamicLogger)
 
