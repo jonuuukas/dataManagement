@@ -33,7 +33,6 @@ def hello():
     """
     Opening function that directs to index.html
     """
-    print CONFIG.USER_PROXY
     return send_from_directory('templates', 'index.html')
 @app.route('/api/help', methods = ['GET'])
 def help():
@@ -250,7 +249,6 @@ def das_driver_all():
         for item in data['data']:
             for site in item['site']:
                 if 'dataset_fraction' in site and site['kind']=="Disk":
-                    print site['name']
                     proc = subprocess.call("eval `scramv1 runtime -sh`; cat "+cred+" | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY="+CONFIG.USER_PROXY+"; das_client.py  --limit 10 --query 'file dataset="+key+" site="+site['name']+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log2_file, stderr=err2_file, shell=True)
                     log2_file.seek(0)
                     err2_file.seek(0)
@@ -258,9 +256,7 @@ def das_driver_all():
                     data2 = json.loads(text2)
                     for item2 in data2['data']:
                         for root in item2['file']:
-                            print root['name']
                             return root['name']
-        print ("Something is not right with me")
         return ("No")
             
     data = json.loads(request.get_data())
@@ -278,7 +274,6 @@ def das_driver_all():
         err_file = file('dasTest_err'+str(i)+'.txt','w+')
         log2_file = file('dasTest_2out'+str(i)+'.txt','w+')
         err2_file = file('dasTest_2err'+str(i)+'.txt','w+')
-        print key
         fileNames[key]['file'] = check_ds()
         i+=1
         log_file.close()
@@ -310,7 +305,6 @@ def das_driver_single():
     for item in data['data']:
         for site in item['site']:
             if 'dataset_fraction' in site and site['kind']=="Disk":
-                print site['name']
                 proc = subprocess.call("eval `scramv1 runtime -sh`; cat "+cred+" | voms-proxy-init -voms cms -pwstdin > dasTest_voms.txt;export X509_USER_PROXY="+CONFIG.USER_PROXY+"; das_client.py  --limit 10 --query 'file dataset="+dsName+" site="+site['name']+"' --key=$X509_USER_PROXY --cert=$X509_USER_PROXY --format=json",stdout=log2_file, stderr=err2_file, shell=True)
                 log2_file.seek(0)
                 err2_file.seek(0)
@@ -318,10 +312,8 @@ def das_driver_single():
                 data2 = json.loads(text2)
                 for item2 in data2['data']:
                     for root in item2['file']:
-                        print root['name']
                         fileNames[dsName]['file'] = root['name']
                         return json.dumps(fileNames)
-    print("something is wrong with this ds")
     log_file.close()
     err_file.close()
     log2_file.close()
@@ -343,14 +335,12 @@ def test_campaign():
     req = data['req']
     doc = json.dumps(data['doc'])
     __scram = get_scram(__release)
-    print (__scram)
     if __scram == '':
         return "No scram"
     #----------Creating & running bash file----------------------
 
     __curr_dir = os.getcwd()
     os.chdir(WORK_DIR)
-    print("changed dir to /stuff")
     __exec_file = open("tmp_test.sh", "w")
     __exec_file.write(get_test_bash(__release, _id, __scram))
     __exec_file.close()
@@ -361,15 +351,12 @@ def test_campaign():
     log_file.close()
     err_file.close()
     #_ret_code = proc.wait()
-    print("finished running tmp_test")
     #raise Exception(str(_ret_code))
     #-----------------Running the cmsRun command-------------------------
     os.chdir("Test_Folder" + '/' + __release + '/' + "src/")
     cfgFile = open("master.conf","r")
     i = 0   #loop needed to cycle through all the datasets and differ gathered information based on the dataset name
-    dynamicLogger={}
-    print ("starting the loop thrtough master.conf")
-    
+    dynamicLogger={}    
     for line in cfgFile:
         if line.startswith("cfg_path="):
 
@@ -394,7 +381,6 @@ def test_campaign():
     cfgFile.close()
 
 #-----------------Uploading log file-------------------------
-    print("finished looping. returning to the AngularJS")
     os.chdir(__curr_dir) ## back to working dir
     return json.dumps(dynamicLogger)
 
