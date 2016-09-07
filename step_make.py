@@ -19,7 +19,7 @@ class MasterConfMaker:
         self.couch = CouchDBInterface()
         self.cmsD = True
         self.data = self.couch.get_file(doc_id)
-    
+
     def makeMaster(self):
         """
         method to form configuration files
@@ -32,7 +32,7 @@ class MasterConfMaker:
         lumi_list = self.data['lumi']
         era = self.data['data']['era']
         del drive['Default']
-        
+
         #make master config header
         master = file('master.conf','w')
         header = "[DEFAULT]\n"
@@ -84,9 +84,9 @@ class MasterConfMaker:
 
             master.write('[%s%s%sPrio%d]\n' % (__id, era, ds.split("/")[1], prio))
             master.write('campaign=Run%s\n' % (era))
-            master.write('priority=%d\n' % (prio)) 
+            master.write('priority=%d\n' % (prio))
             master.write('dset_run_dict={"%s" : %s}\n' % (ds, json.dumps(lumi_list.keys())))
-            
+
             if (cfg != ''):
                 master.write('cfg_path=%s\n' % (cfg))
                 transient_output = self.data['data']['req'][ds]['transient_output']

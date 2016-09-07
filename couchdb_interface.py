@@ -13,7 +13,7 @@ class CouchDBInterface:
         """
         init a class
         """
-        self.url_address = db_url        
+        self.url_address = db_url
         self.opener = urllib2.build_opener(urllib2.HTTPHandler)
 
     def put_file(self, stringToPut):
