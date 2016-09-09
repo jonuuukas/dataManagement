@@ -29,7 +29,7 @@ class MasterConfMaker:
         __release = self.data['data']['CMSSW']
         drive = self.data['drive']
         check = self.data['check']
-        prep_id = self.data['prepId']
+        prep_id = self.data['data']['prepId']
         lumi_list = self.data['lumi']
         era = self.data['data']['era']
         del drive['Default']
