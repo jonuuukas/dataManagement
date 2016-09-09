@@ -118,10 +118,14 @@ def update_file():
     data = json.loads(request.get_data())
     _id = data['_id']
     _rev = data['_rev']
+    prep_id = data['doc']['data']['prepId']
     data['doc']['alca'] = data['alca']
     data['doc']['skim'] = data['skim']
     data['doc']['lumi'] = data['lumi']
     data['doc']['is_tested'] = data['is_tested']
+    if prep_id.split('-')[1] != data['doc']['data']['procStr']:
+        prep_id = prep_id.split('-')[0] + "-" + data['doc']['data']['procStr']+ "-" + prep_id.split('-')[2]
+        data['doc']['data']['prepId'] = prep_id
     doc = json.dumps(data['doc'])
     doc_data = couch.update_file(_id, doc, _rev)
     return json.dumps(doc_data)
