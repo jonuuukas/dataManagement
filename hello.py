@@ -12,10 +12,9 @@ import imp
 
 from couchdb_interface import CouchDBInterface
 from config import CONFIG
-
-
 from flask import Flask, send_from_directory, redirect, Response, make_response, request, jsonify
 from subprocess import Popen, PIPE
+
 app = Flask(__name__)
 ###original
 WORK_DIR = CONFIG.WORK_DIR
@@ -164,8 +163,13 @@ def save_doc():
     """
     Puts a newly created object to the CouchDB
     """
-    data = request.get_data()
-    doc_data = couch.put_file(data)
+    data = json.loads(request.get_data())
+    sequence = couch.get_sequence()
+    seq_rev = sequence['_rev']
+    data['data']['prepId'] = 'ReReco-' + data['data']['procStr'] + "-000" + str(sequence['sequenceNo'])
+    sequence['sequenceNo'] = int(sequence['sequenceNo']) + 1 
+    seq_data = couch.update_sequence(json.dumps(sequence), seq_rev)
+    doc_data = couch.put_file(json.dumps(data))
     return json.dumps(doc_data)
 
 def get_test_bash(__release, _id, __scram):
@@ -423,4 +427,17 @@ def submit_campaign():
     return str(__ret_code)
 
 if __name__ == "__main__":
+    import logging
+    logFormatStr = '[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'
+    logging.basicConfig(format = logFormatStr, filename = "global.log", level=10)
+    formatter = logging.Formatter(logFormatStr,'%m-%d %H:%M:%S')
+    fileHandler = logging.FileHandler("summary.log")
+    fileHandler.setLevel(10)
+    fileHandler.setFormatter(formatter)
+    streamHandler = logging.StreamHandler()
+    streamHandler.setLevel(10)
+    streamHandler.setFormatter(formatter)
+    app.logger.addHandler(fileHandler)
+    app.logger.addHandler(streamHandler)
+    app.logger.info("Logging is set up.")
     app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
