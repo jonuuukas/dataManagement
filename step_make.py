@@ -32,7 +32,8 @@ class MasterConfMaker:
         prep_id = self.data['data']['prepId']
         lumi_list = self.data['lumi']
         era = self.data['data']['era']
-        del drive['Default']
+        if 'Default' in drive:
+            del drive['Default']
 
         #make master config header
         master = file('master.conf','w')
